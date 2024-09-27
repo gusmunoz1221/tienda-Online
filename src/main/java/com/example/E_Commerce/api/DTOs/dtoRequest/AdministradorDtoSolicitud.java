@@ -1,4 +1,4 @@
-package com.example.E_Commerce.domain.api.DTOs.dtoRequest;
+package com.example.E_Commerce.api.DTOs.dtoRequest;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;

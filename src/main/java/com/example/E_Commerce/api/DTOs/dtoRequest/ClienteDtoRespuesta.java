@@ -1,4 +1,4 @@
-package com.example.E_Commerce.domain.api.DTOs.dtoRequest;
+package com.example.E_Commerce.api.DTOs.dtoRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
