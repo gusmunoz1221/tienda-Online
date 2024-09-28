@@ -6,6 +6,7 @@ import com.example.E_Commerce.domain.entities.CarritoEntity;
 import com.example.E_Commerce.domain.entities.ClienteEntity;
 import com.example.E_Commerce.domain.mappers.ClienteMapper;
 import com.example.E_Commerce.domain.repositories.ClienteRepository;
+import com.example.E_Commerce.infraestructura.exceptions.DuplicateEmailException;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -20,14 +21,18 @@ public class ClienteService {
 
     public ClienteDtoRespuesta crearCliente(ClienteDtoSolicitud clienteDtoSolicitud){
 
+        if(clienteRepository.existsByCorreoElectronico(clienteDtoSolicitud.getCorreoElectronico()))
+            throw new DuplicateEmailException("el correo electronico ingresado ya existe");
+
+
         ClienteEntity clienteEntity = ClienteEntity.builder()
-                .id(UUID.randomUUID())
-                .carrito(new CarritoEntity())
-                .nombre(clienteDtoSolicitud.getNombre())
-                .correoElectronico(clienteDtoSolicitud.getCorreoElectronico())
-                .contrasena(clienteDtoSolicitud.getContraseña())
-                .direccion(clienteDtoSolicitud.getDireccion())
-                .build();
+                                                    .id(UUID.randomUUID())
+                                                    .carrito(new CarritoEntity())
+                                                    .nombre(clienteDtoSolicitud.getNombre())
+                                                    .correoElectronico(clienteDtoSolicitud.getCorreoElectronico())
+                                                    .contrasena(clienteDtoSolicitud.getContraseña())
+                                                    .direccion(clienteDtoSolicitud.getDireccion())
+                                                    .build();
         clienteRepository.save(clienteEntity);
         return clienteMapper.ClienteToClienteDtoRespuesta(clienteEntity);
 

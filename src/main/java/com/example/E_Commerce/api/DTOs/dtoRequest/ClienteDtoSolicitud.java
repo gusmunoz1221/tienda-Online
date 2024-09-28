@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ClienteDtoSolicitud {
 
+
+    @NotBlank(message = "el nombre es obligatorio")
+    @Size(min = 5, max = 10,message = "la longitud minima del nombre es 3, maxima 10")
     private String nombre;
 
     @Email(message = "correo electronico invalido")
