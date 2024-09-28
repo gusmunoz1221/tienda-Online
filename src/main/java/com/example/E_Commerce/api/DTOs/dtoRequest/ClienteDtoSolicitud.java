@@ -24,10 +24,10 @@ public class ClienteDtoSolicitud {
     @NotBlank(message = "correo electronico es obligatorio")
     @Size(min = 5, max = 10,message = "la longitud minima del correo es 5, maxima 12")
     @Column(unique = true)//garantiza que cada usuario tenga un correo unico
-    private String correoElectronico;
+    private String correo;
 
     @Size(min = 5, max = 10,message = "la longitud minima de la contraseña es 5, maxima 12")
-    private String contraseña;
+    private String contrasena;
 
     private String direccion;
 }

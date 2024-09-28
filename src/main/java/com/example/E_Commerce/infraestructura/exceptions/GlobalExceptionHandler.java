@@ -9,17 +9,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(DuplicateEmailException.class)
+    @ExceptionHandler(CorreoDuplicadolException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<ErrorMessageException> duplicateEmailExceptionHandler(HttpServletRequest request, Exception exception ){
-        return new ResponseEntity<ErrorMessageException>(new ErrorMessageException(exception.getMessage(),409), HttpStatus.CONFLICT);
+    public ResponseEntity<MensajeDeErrorException> duplicateEmailExceptionHandler(HttpServletRequest request, Exception exception ){
+        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),409), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(ArgumentoIlegalException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorMessageException> illegalArgumentExceptionHanlder(HttpServletRequest request, Exception exception){
-        return new ResponseEntity<ErrorMessageException>(new ErrorMessageException(exception.getMessage(),400),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<MensajeDeErrorException> illegalArgumentExceptionHanlder(HttpServletRequest request, Exception exception){
+        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),400),HttpStatus.BAD_REQUEST);
     }
 
-    
+    @ExceptionHandler(ClienteNoEncontradoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<MensajeDeErrorException> ClientNotFoundExceptionHandler(HttpServletRequest request, Exception exception){
+        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),404),HttpStatus.NOT_FOUND);
+    }
 }
