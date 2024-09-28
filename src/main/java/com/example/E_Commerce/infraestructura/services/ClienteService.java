@@ -19,7 +19,7 @@ public class ClienteService {
     }
 
     public ClienteDtoRespuesta crearCliente(ClienteDtoSolicitud clienteDtoSolicitud){
-
+//
         ClienteEntity clienteEntity = ClienteEntity.builder()
                 .id(UUID.randomUUID())
                 .carrito(new CarritoEntity())
@@ -30,6 +30,8 @@ public class ClienteService {
                 .build();
         clienteRepository.save(clienteEntity);
         return clienteMapper.ClienteToClienteDtoRespuesta(clienteEntity);
+
+
 
     }
 
