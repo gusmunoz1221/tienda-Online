@@ -1,13 +1,15 @@
 package com.example.E_Commerce.infraestructura.services;
 
+import com.example.E_Commerce.api.DTOs.dtoRequest.ClienteDtoSolicitudCorreo;
 import com.example.E_Commerce.api.DTOs.dtoResponse.ClienteDtoRespuesta;
 import com.example.E_Commerce.api.DTOs.dtoRequest.ClienteDtoSolicitud;
 import com.example.E_Commerce.api.DTOs.dtoResponse.ClienteDtoRespuestaCorreo;
+import com.example.E_Commerce.domain.Rol;
 import com.example.E_Commerce.domain.entities.CarritoEntity;
-import com.example.E_Commerce.domain.entities.ClienteEntity;
+import com.example.E_Commerce.domain.entities.UsuarioEntity;
 import com.example.E_Commerce.domain.helpers.CorreoElectronicoHelper;
 import com.example.E_Commerce.domain.mappers.ClienteMapper;
-import com.example.E_Commerce.domain.repositories.ClienteRepository;
+import com.example.E_Commerce.domain.repositories.UsuarioRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ClienteNoEncontradoException;
 import com.example.E_Commerce.infraestructura.exceptions.CorreoDuplicadolException;
 import com.example.E_Commerce.infraestructura.exceptions.ArgumentoIlegalException;
@@ -16,32 +18,34 @@ import java.util.UUID;
 
 @Service
 public class ClienteService {
-    private final ClienteRepository clienteRepository;
+    private final UsuarioRepository clienteRepository;
     private final ClienteMapper clienteMapper;
     private final CorreoElectronicoHelper correoElectronicoHelper;
-    public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper, CorreoElectronicoHelper correoElectronicoHelper) {
+
+    public ClienteService(UsuarioRepository clienteRepository, ClienteMapper clienteMapper, CorreoElectronicoHelper correoElectronicoHelper) {
         this.clienteRepository = clienteRepository;
         this.clienteMapper = clienteMapper;
         this.correoElectronicoHelper = correoElectronicoHelper;
     }
 
 
-    public ClienteDtoRespuesta crearCliente(ClienteDtoSolicitud clienteDtoSolicitud){
+    public ClienteDtoRespuesta agregarCliente(ClienteDtoSolicitud clienteDtoSolicitud){
 
         if(!correoElectronicoHelper.esValidoCorreoElectornico(clienteDtoSolicitud.getCorreo()))
             throw new ArgumentoIlegalException("el correo electronico no posee un formato valido");
 
-        if(clienteRepository.existsByCorreoElectronico(clienteDtoSolicitud.getCorreo()))
+        if(clienteRepository.existsByCorreo(clienteDtoSolicitud.getCorreo()))
             throw new CorreoDuplicadolException("el correo electronico ingresado ya existe");
 
 
-        ClienteEntity cliente = ClienteEntity.builder()
-                                             .id(UUID.randomUUID())
+        UsuarioEntity cliente = UsuarioEntity.builder()
                                              .carrito(new CarritoEntity())
                                              .nombre(clienteDtoSolicitud.getNombre())
                                              .correo(clienteDtoSolicitud.getCorreo())
-                                             .contrasena(clienteDtoSolicitud.getContrasena())
+                                             .contrasena(clienteDtoSolicitud.getContrasena()) // mas adelante implementare security y sus roles en login y logout
                                              .direccion(clienteDtoSolicitud.getDireccion())
+                                             .habilitado(true)
+                                             .rol(Rol.CLIENTE)
                                              .build();
 
         clienteRepository.save(cliente);
@@ -61,25 +65,43 @@ public class ClienteService {
 
     public ClienteDtoRespuesta actualizarDatosCliente(UUID id, ClienteDtoSolicitud clienteDto){
 
-        ClienteEntity cliente = clienteRepository.findById(id).orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
+        UsuarioEntity cliente = clienteRepository.findById(id).orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
 
-        cliente.setNombre(clienteDto.getNombre());
+        cliente.setNombre((clienteDto.getNombre()));
         cliente.setDireccion(clienteDto.getDireccion());
         clienteRepository.save(cliente);
         return clienteMapper.ClienteToClienteDtoRespuesta(cliente);
     }
 
-    public ClienteDtoRespuestaCorreo actualizarCorreoElectronico(UUID id, String nuevoCorreo){
+    public ClienteDtoRespuestaCorreo actualizarCorreoElectronico(UUID id, ClienteDtoSolicitudCorreo correoDto){
 
-        if(!correoElectronicoHelper.esValidoCorreoElectornico(nuevoCorreo))
+        if(!correoElectronicoHelper.esValidoCorreoElectornico(correoDto.getCorreo()))
             throw new ArgumentoIlegalException("el correo electronico no posee un formato valido");
 
-        ClienteEntity cliente  = clienteRepository.findById(id).orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
+        UsuarioEntity cliente  = clienteRepository.findById(id).orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
 
-        if(clienteRepository.existsByCorreoElectronico(cliente.getCorreo()))
+        if(clienteRepository.existsByCorreo(cliente.getCorreo()))
             throw new CorreoDuplicadolException("debe colocar un correo electronico diferente al registrado");
 
-        cliente.setCorreo(nuevoCorreo);
-        return clienteMapper.nuevoCorreoToNuevoCorreoDto(nuevoCorreo);
+        cliente.setCorreo(correoDto.getCorreo());
+        return clienteMapper.nuevoCorreoToNuevoCorreoDto(correoDto.getCorreo());
     }
+
+    public void deshabilitarUsuario(UUID id) {
+        UsuarioEntity Usuario = clienteRepository.findById(id).orElseThrow(()-> new ClienteNoEncontradoException("cliente no encontrado"));
+        if (Usuario.isHabilitado()) {
+            Usuario.setHabilitado(false);
+            clienteRepository.save(Usuario);
+        }
+    }
+
+
+    public void habilitarUsuario(UUID id) {
+        UsuarioEntity Usuario = clienteRepository.findById(id).orElseThrow(()-> new ClienteNoEncontradoException("cliente no encontrado"));
+        if (!Usuario.isHabilitado()) {
+            Usuario.setHabilitado(true);
+            clienteRepository.save(Usuario);
+        }
+    }
+
 }

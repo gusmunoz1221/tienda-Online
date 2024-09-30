@@ -1,24 +1,43 @@
 package com.example.E_Commerce.domain.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import com.example.E_Commerce.domain.Rol;
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Data
-@SuperBuilder
-@MappedSuperclass  //no crea una tabla para Usuario, permitiendo que las clases hijas hereden sus atributos -> ESPECIALIZACION
-public abstract class UsuarioEntity {
+@Entity
+@Table(name = "cliente")
+public class UsuarioEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     private String nombre;
     private String correo;
     private String contrasena;
     private String direccion;
+    @Enumerated(EnumType.STRING)
+    private Rol rol;
+    boolean habilitado;
+
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private CarritoEntity carrito;
+
+    @OneToMany(
+            mappedBy = "cliente",
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            fetch = FetchType.LAZY) // evita carga innecesaria de datos cuando no son requeridos.)
+    private List<PedidoEntity> pedidos;
+
 
 }

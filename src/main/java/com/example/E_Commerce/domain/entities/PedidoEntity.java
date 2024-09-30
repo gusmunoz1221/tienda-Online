@@ -24,7 +24,7 @@ public class PedidoEntity {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private ClienteEntity cliente;
+    private UsuarioEntity cliente;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY) // evita carga innecesaria de datos cuando no son requeridos.
     @JoinColumn(name = "pedido_id")

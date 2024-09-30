@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class ClienteDtoRespuestaCorreo {
-    String Correo;
+
+    String correo;
 }

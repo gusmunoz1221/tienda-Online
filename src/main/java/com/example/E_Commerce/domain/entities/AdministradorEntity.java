@@ -11,7 +11,7 @@ import lombok.Builder;
 
 import java.util.UUID;
 
-@Entity
+/*@Entity
 @Table(name = "administrador")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,6 +19,6 @@ import java.util.UUID;
 public class AdministradorEntity extends UsuarioEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-}
+}*/

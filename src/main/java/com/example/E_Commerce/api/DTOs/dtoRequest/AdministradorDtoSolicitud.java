@@ -15,14 +15,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AdministradorDtoSolicitud {
 
+    @Size(min = 5, max = 30,message = "la longitud minima del nombre es 3(tres)")
     private String nombre;
 
     @Email(message = "correo electronico invalido")
     @NotBlank(message = "correo electronico es obligatorio")
-    @Size(min = 5, max = 10,message = "la longitud minima del correo es 5, maxima 12")
+    @Size(min = 5, max = 30,message = "la longitud minima del correo es 5(cinco)")
     @Column(unique = true)//garantiza que cada usuario tenga un correo unico
     private String correo;
 
-    @Size(min = 5, max = 10,message = "la longitud minima de la contraseña es 5, maxima 12")
-    private String contraseña;
+    @Size(min = 5, max = 30,message = "la longitud minima de la contraseña es 5(cinco), maxima(dieciseis)")
+    private String contrasena;
 }

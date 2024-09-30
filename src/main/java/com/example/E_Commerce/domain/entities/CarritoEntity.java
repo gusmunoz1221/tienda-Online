@@ -20,8 +20,8 @@ public class CarritoEntity {
     Long id;
 
     @OneToOne
-    @JoinColumn(name = "cliente_id", unique = true)
-    private ClienteEntity cliente;
+    @JoinColumn(name = "cliente_id")
+    private UsuarioEntity cliente;
 
     @ManyToMany
     @JoinTable(
