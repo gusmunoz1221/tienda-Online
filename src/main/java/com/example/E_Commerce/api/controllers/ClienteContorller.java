@@ -42,7 +42,7 @@ public class ClienteContorller {
         return ResponseEntity.ok(clienteService.agregarCliente(clienteDto));
     }
 
-    @PostMapping("{id}")
+    @GetMapping("{id}")
     ResponseEntity<ClienteDtoRespuesta> obtenerClientePorId(@PathVariable UUID id){
         return ResponseEntity.ok(clienteService.obtenerClientePorId(id));
     }
@@ -52,10 +52,16 @@ public class ClienteContorller {
         return ResponseEntity.ok(clienteService.actualizarDatosCliente(id,clienteDto));
     }
 
-    @DeleteMapping("{id}")
+    @PutMapping("/correo/{id}")
     ResponseEntity<ClienteDtoRespuestaCorreo> actualizarCorreoElectronico(@PathVariable UUID id,
                                                                           @Valid @Validated @RequestBody ClienteDtoSolicitudCorreo correoDto){
         return ResponseEntity.ok(clienteService.actualizarCorreoElectronico(id,correoDto));
+    }
+
+    @DeleteMapping("{id}")
+    ResponseEntity<Void> DesabilitarUsuario(@PathVariable UUID id){
+        clienteService.deshabilitarUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

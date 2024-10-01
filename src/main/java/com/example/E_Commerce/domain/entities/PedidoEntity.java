@@ -21,6 +21,7 @@ public class PedidoEntity {
     private Long id;
 
     private Date fecha;
+    private Integer numeroDePedido;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")

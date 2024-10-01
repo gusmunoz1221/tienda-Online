@@ -88,19 +88,20 @@ public class ClienteService {
     }
 
     public void deshabilitarUsuario(UUID id) {
-        UsuarioEntity Usuario = clienteRepository.findById(id).orElseThrow(()-> new ClienteNoEncontradoException("cliente no encontrado"));
-        if (Usuario.isHabilitado()) {
-            Usuario.setHabilitado(false);
-            clienteRepository.save(Usuario);
+        UsuarioEntity cliente = clienteRepository.findById(id).orElseThrow(()-> new ClienteNoEncontradoException("cliente no encontrado"));
+        if (cliente.isHabilitado()) {
+            cliente.setHabilitado(false);
+            clienteRepository.save(cliente);
+            correoElectronicoHelper.enviarCorreoCancelacionDeCuenta(cliente.getCorreo(),cliente.getNombre());
         }
     }
 
 
     public void habilitarUsuario(UUID id) {
-        UsuarioEntity Usuario = clienteRepository.findById(id).orElseThrow(()-> new ClienteNoEncontradoException("cliente no encontrado"));
-        if (!Usuario.isHabilitado()) {
-            Usuario.setHabilitado(true);
-            clienteRepository.save(Usuario);
+        UsuarioEntity cliente = clienteRepository.findById(id).orElseThrow(()-> new ClienteNoEncontradoException("cliente no encontrado"));
+        if (!cliente.isHabilitado()) {
+            cliente.setHabilitado(true);
+            clienteRepository.save(cliente);
         }
     }
 

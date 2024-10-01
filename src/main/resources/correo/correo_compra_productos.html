@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Compra - Rosa Negra</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #1b1b1b;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+            overflow: hidden;
+            border: 2px solid #DA70D6;
+        }
+        .header {
+            background-color: #1b1b1b;
+            color: #FFD700;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #FFD700;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin: 0;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            color: #FFD700;
+        }
+        .body {
+            padding: 30px;
+        }
+        .body h2 {
+            color: #DA70D6;
+            margin-top: 0;
+            font-size: 24px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+        .body p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #FFD700;
+            color: #1b1b1b;
+            padding: 12px 24px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+        .button:hover {
+            background-color: #FFC700;
+        }
+        .footer {
+            background-color: #1b1b1b;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #a9a9a9;
+        }
+        .footer p {
+            margin: 0;
+        }
+        .contact {
+            background-color: #1b1b1b;
+            padding: 20px;
+            text-align: center;
+            border-top: 4px solid #FFD700;
+        }
+        .contact h3 {
+            color: #FFD700;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .social-icons {
+            margin-top: 10px;
+        }
+        .social-icons a {
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        .social-icons img {
+            width: 40px;
+            height: 40px;
+            transition: transform 0.3s ease;
+        }
+        .social-icons img:hover {
+            transform: scale(1.2);
+        }
+        a {
+            color: #DA70D6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+     <script>
+        function toggleDetails() {
+            const detailsSection = document.getElementById('product-details');
+            // Cambia la visibilidad de la sección
+            if (detailsSection.style.display === 'none' || detailsSection.style.display === '') {
+                detailsSection.style.display = 'block';
+            } else {
+                detailsSection.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>¡Tu compra en Rosa Negra está confirmada!</h1>
+    </div>
+    <div class="body">
+        <h2>Gracias por elegirnos</h2>
+        <p>Hola {nombre},</p>
+        <p>Nos complace informarte que tu compra ha sido confirmada exitosamente. Aquí están los detalles de tu pedido:</p>
+        <p><strong>Número de Pedido:</strong> {numeroPedido}</p>
+        <p><strong>Fecha:</strong> {fecha}</p>
+        <p><strong>Detalles de los productos Comprados:</strong> {productos}</p>
+        <p>Si tienes alguna pregunta, no dudes en <a href="mailto:soporte@rosanegra.com">contactarnos</a>.</p>
+        <p>Gracias por confiar en Rosa Negra. ¡Esperamos que disfrutes tus productos!</p>
+
+    </div>
+
+
+    <div class="contact">
+        <h3>¡Conéctate con nosotros!</h3>
+        <p>Sigue nuestras redes sociales para estar al tanto de las últimas novedades y ofertas especiales:</p>
+        <div class="social-icons">
+            <a href="https://www.facebook.com/profile.php?id=100043722817247" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+            </a>
+            <a href="https://www.instagram.com/gusmunoz_1221/" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Rosa Negra. Todos los derechos reservados.</p>
+    </div>
+</div>
+</body>
+</html>
