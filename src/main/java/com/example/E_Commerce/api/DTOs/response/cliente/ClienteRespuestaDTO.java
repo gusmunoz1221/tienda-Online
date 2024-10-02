@@ -1,4 +1,4 @@
-package com.example.E_Commerce.api.DTOs.dtoResponse;
+package com.example.E_Commerce.api.DTOs.response.cliente;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ClienteDtoRespuesta {
+public class ClienteRespuestaDTO {
 
     private String nombre;
     private String correo;

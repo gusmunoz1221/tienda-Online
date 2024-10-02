@@ -1,9 +1,9 @@
 package com.example.E_Commerce.api.controllers;
 
-import com.example.E_Commerce.api.DTOs.dtoRequest.ClienteDtoSolicitud;
-import com.example.E_Commerce.api.DTOs.dtoRequest.ClienteDtoSolicitudCorreo;
-import com.example.E_Commerce.api.DTOs.dtoResponse.ClienteDtoRespuesta;
-import com.example.E_Commerce.api.DTOs.dtoResponse.ClienteDtoRespuestaCorreo;
+import com.example.E_Commerce.api.DTOs.request.cliente.ClienteSolicitudDTO;
+import com.example.E_Commerce.api.DTOs.request.cliente.ClienteSolicitudCorreoDTO;
+import com.example.E_Commerce.api.DTOs.response.cliente.ClienteRespuestaDTO;
+import com.example.E_Commerce.api.DTOs.response.cliente.ClienteRespuestaCorreoDTO;
 import com.example.E_Commerce.infraestructura.services.ClienteService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class ClienteContorller {
     }
 
     @PostMapping
-    public ResponseEntity<?> agregarCliente(@Valid @RequestBody @Validated ClienteDtoSolicitud clienteDto, BindingResult resultado){
+    public ResponseEntity<?> agregarCliente(@Valid @RequestBody @Validated ClienteSolicitudDTO clienteDto, BindingResult resultado){
 
         if (resultado.hasErrors()){
             List<FieldError> campoDeErrores = resultado.getFieldErrors();
@@ -43,18 +43,18 @@ public class ClienteContorller {
     }
 
     @GetMapping("{id}")
-    ResponseEntity<ClienteDtoRespuesta> obtenerClientePorId(@PathVariable UUID id){
+    ResponseEntity<ClienteRespuestaDTO> obtenerClientePorId(@PathVariable UUID id){
         return ResponseEntity.ok(clienteService.obtenerClientePorId(id));
     }
 
     @PutMapping("{id}")
-    ResponseEntity<ClienteDtoRespuesta> actualizarDatosCliente(@PathVariable UUID id, @Valid @RequestBody ClienteDtoSolicitud clienteDto){
+    ResponseEntity<ClienteRespuestaDTO> actualizarDatosCliente(@PathVariable UUID id, @Valid @RequestBody ClienteSolicitudDTO clienteDto){
         return ResponseEntity.ok(clienteService.actualizarDatosCliente(id,clienteDto));
     }
 
     @PutMapping("/correo/{id}")
-    ResponseEntity<ClienteDtoRespuestaCorreo> actualizarCorreoElectronico(@PathVariable UUID id,
-                                                                          @Valid @Validated @RequestBody ClienteDtoSolicitudCorreo correoDto){
+    ResponseEntity<ClienteRespuestaCorreoDTO> actualizarCorreoElectronico(@PathVariable UUID id,
+                                                                          @Valid @Validated @RequestBody ClienteSolicitudCorreoDTO correoDto){
         return ResponseEntity.ok(clienteService.actualizarCorreoElectronico(id,correoDto));
     }
 

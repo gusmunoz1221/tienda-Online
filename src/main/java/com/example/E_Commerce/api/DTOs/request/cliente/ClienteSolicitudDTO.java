@@ -1,4 +1,4 @@
-package com.example.E_Commerce.api.DTOs.dtoRequest;
+package com.example.E_Commerce.api.DTOs.request.cliente;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ClienteDtoSolicitud {
+public class ClienteSolicitudDTO {
 
     @NotBlank(message = "el nombre es obligatorio")
     @Size(min = 5, max = 30,message = "la longitud minima del nombre es 3(tres)")

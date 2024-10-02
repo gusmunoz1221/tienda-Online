@@ -1,4 +1,4 @@
-package com.example.E_Commerce.api.DTOs.dtoRequest;
+package com.example.E_Commerce.api.DTOs.request.cliente;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ClienteDtoSolicitudCorreo {
+public class ClienteSolicitudCorreoDTO {
 
     @Email(message = "correo electronico invalido")
     @NotBlank(message = "correo electronico es obligatorio")

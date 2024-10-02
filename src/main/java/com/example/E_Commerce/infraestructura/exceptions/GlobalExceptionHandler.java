@@ -11,19 +11,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     @ExceptionHandler(CorreoDuplicadolException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<MensajeDeErrorException> handlerduplicateEmail(HttpServletRequest request, Exception exception ){
-        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),409), HttpStatus.CONFLICT);
+    public ResponseEntity<MensajeDeErrorException> manejadorCorreoDuplicado(Exception e ){
+        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(e.getMessage(),409), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ArgumentoIlegalException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<MensajeDeErrorException> handlerillegalArgument(HttpServletRequest request, Exception exception){
-        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),400),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<MensajeDeErrorException> manejadorArgumentoIlegal(Exception e){
+        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(e.getMessage(),400),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ClienteNoEncontradoException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<MensajeDeErrorException> handlerClientNotFound(HttpServletRequest request, Exception exception){
+    public ResponseEntity<MensajeDeErrorException> manejdarorClienteNoEncontrado(HttpServletRequest request, Exception exception){
+        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),404),HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProductoNoEncontradoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<MensajeDeErrorException> manejadroProductoNoEncontrado(Exception exception){
         return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),404),HttpStatus.NOT_FOUND);
     }
 }

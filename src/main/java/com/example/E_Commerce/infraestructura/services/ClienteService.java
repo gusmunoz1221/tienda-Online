@@ -1,9 +1,9 @@
 package com.example.E_Commerce.infraestructura.services;
 
-import com.example.E_Commerce.api.DTOs.dtoRequest.ClienteDtoSolicitudCorreo;
-import com.example.E_Commerce.api.DTOs.dtoResponse.ClienteDtoRespuesta;
-import com.example.E_Commerce.api.DTOs.dtoRequest.ClienteDtoSolicitud;
-import com.example.E_Commerce.api.DTOs.dtoResponse.ClienteDtoRespuestaCorreo;
+import com.example.E_Commerce.api.DTOs.request.cliente.ClienteSolicitudCorreoDTO;
+import com.example.E_Commerce.api.DTOs.response.cliente.ClienteRespuestaDTO;
+import com.example.E_Commerce.api.DTOs.request.cliente.ClienteSolicitudDTO;
+import com.example.E_Commerce.api.DTOs.response.cliente.ClienteRespuestaCorreoDTO;
 import com.example.E_Commerce.domain.Rol;
 import com.example.E_Commerce.domain.entities.CarritoEntity;
 import com.example.E_Commerce.domain.entities.UsuarioEntity;
@@ -29,21 +29,21 @@ public class ClienteService {
     }
 
 
-    public ClienteDtoRespuesta agregarCliente(ClienteDtoSolicitud clienteDtoSolicitud){
+    public ClienteRespuestaDTO agregarCliente(ClienteSolicitudDTO clienteSolicitud){
 
-        if(!correoElectronicoHelper.esValidoCorreoElectornico(clienteDtoSolicitud.getCorreo()))
+        if(!correoElectronicoHelper.esValidoCorreoElectornico(clienteSolicitud.getCorreo()))
             throw new ArgumentoIlegalException("el correo electronico no posee un formato valido");
 
-        if(clienteRepository.existsByCorreo(clienteDtoSolicitud.getCorreo()))
+        if(clienteRepository.existsByCorreo(clienteSolicitud.getCorreo()))
             throw new CorreoDuplicadolException("el correo electronico ingresado ya existe");
 
 
         UsuarioEntity cliente = UsuarioEntity.builder()
                                              .carrito(new CarritoEntity())
-                                             .nombre(clienteDtoSolicitud.getNombre())
-                                             .correo(clienteDtoSolicitud.getCorreo())
-                                             .contrasena(clienteDtoSolicitud.getContrasena()) // mas adelante implementare security y sus roles en login y logout
-                                             .direccion(clienteDtoSolicitud.getDireccion())
+                                             .nombre(clienteSolicitud.getNombre())
+                                             .correo(clienteSolicitud.getCorreo())
+                                             .contrasena(clienteSolicitud.getContrasena()) // mas adelante implementare security y sus roles en login y logout
+                                             .direccion(clienteSolicitud.getDireccion())
                                              .habilitado(true)
                                              .rol(Rol.CLIENTE)
                                              .build();
@@ -55,7 +55,7 @@ public class ClienteService {
 
 
     //encuentro el cliente y y lo retorno directamente mapeandolo a DTO
-    public ClienteDtoRespuesta obtenerClientePorId(UUID id){
+    public ClienteRespuestaDTO obtenerClientePorId(UUID id){
 
         return clienteMapper.ClienteToClienteDtoRespuesta(
                 clienteRepository.findById(id)
@@ -63,7 +63,7 @@ public class ClienteService {
     }
 
 
-    public ClienteDtoRespuesta actualizarDatosCliente(UUID id, ClienteDtoSolicitud clienteDto){
+    public ClienteRespuestaDTO actualizarDatosCliente(UUID id, ClienteSolicitudDTO clienteDto){
 
         UsuarioEntity cliente = clienteRepository.findById(id).orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
 
@@ -73,9 +73,9 @@ public class ClienteService {
         return clienteMapper.ClienteToClienteDtoRespuesta(cliente);
     }
 
-    public ClienteDtoRespuestaCorreo actualizarCorreoElectronico(UUID id, ClienteDtoSolicitudCorreo correoDto){
+    public ClienteRespuestaCorreoDTO actualizarCorreoElectronico(UUID id, ClienteSolicitudCorreoDTO correoSolicitud){
 
-        if(!correoElectronicoHelper.esValidoCorreoElectornico(correoDto.getCorreo()))
+        if(!correoElectronicoHelper.esValidoCorreoElectornico(correoSolicitud.getCorreo()))
             throw new ArgumentoIlegalException("el correo electronico no posee un formato valido");
 
         UsuarioEntity cliente  = clienteRepository.findById(id).orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
@@ -83,8 +83,8 @@ public class ClienteService {
         if(clienteRepository.existsByCorreo(cliente.getCorreo()))
             throw new CorreoDuplicadolException("debe colocar un correo electronico diferente al registrado");
 
-        cliente.setCorreo(correoDto.getCorreo());
-        return clienteMapper.nuevoCorreoToNuevoCorreoDto(correoDto.getCorreo());
+        cliente.setCorreo(correoSolicitud.getCorreo());
+        return clienteMapper.nuevoCorreoToNuevoCorreoDto(correoSolicitud.getCorreo());
     }
 
     public void deshabilitarUsuario(UUID id) {
