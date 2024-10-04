@@ -2,4 +2,3 @@ carrito:
   max_productos: 10
   umbral_descuento: 10000
   porcentaje_descuento: 10
-  paises_permitidos: ["AR"]

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClienteMapper {
-    public ClienteRespuestaDTO ClienteToClienteDtoRespuesta(UsuarioEntity cliente){
+    public ClienteRespuestaDTO clienteToClienteDtoRespuesta(UsuarioEntity cliente){
         ClienteRespuestaDTO clienteDtoRespuesta = new ClienteRespuestaDTO();
         BeanUtils.copyProperties(cliente,clienteDtoRespuesta);
         return clienteDtoRespuesta;

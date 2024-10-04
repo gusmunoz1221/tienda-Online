@@ -50,14 +50,14 @@ public class ClienteService {
 
         clienteRepository.save(cliente);
 
-        return clienteMapper.ClienteToClienteDtoRespuesta(cliente);
+        return clienteMapper.clienteToClienteDtoRespuesta(cliente);
     }
 
 
     //encuentro el cliente y y lo retorno directamente mapeandolo a DTO
     public ClienteRespuestaDTO obtenerClientePorId(UUID id){
 
-        return clienteMapper.ClienteToClienteDtoRespuesta(
+        return clienteMapper.clienteToClienteDtoRespuesta(
                 clienteRepository.findById(id)
                                  .orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado")));
     }
@@ -70,7 +70,7 @@ public class ClienteService {
         cliente.setNombre((clienteDto.getNombre()));
         cliente.setDireccion(clienteDto.getDireccion());
         clienteRepository.save(cliente);
-        return clienteMapper.ClienteToClienteDtoRespuesta(cliente);
+        return clienteMapper.clienteToClienteDtoRespuesta(cliente);
     }
 
     public ClienteRespuestaCorreoDTO actualizarCorreoElectronico(UUID id, ClienteSolicitudCorreoDTO correoSolicitud){

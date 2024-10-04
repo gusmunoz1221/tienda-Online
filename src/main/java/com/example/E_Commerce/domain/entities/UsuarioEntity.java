@@ -30,7 +30,7 @@ public class UsuarioEntity {
     private Rol rol;
     boolean habilitado;
 
-    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private CarritoEntity carrito;
 
     @OneToMany(
