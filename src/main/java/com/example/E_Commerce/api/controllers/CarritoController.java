@@ -2,19 +2,19 @@ package com.example.E_Commerce.api.controllers;
 
 
 import com.example.E_Commerce.api.DTOs.request.carrito.ProductoCarritoSolicitudDTO;
+import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoRespuestaDTO;
 import com.example.E_Commerce.infraestructura.services.CarritoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/carrito")
@@ -40,5 +40,10 @@ public class CarritoController {
         }
 
         return ResponseEntity.ok(carritoService.agregarProductoCarrito(producto));
+    }
+
+    @GetMapping
+    public ResponseEntity<ProductoCarritoRespuestaDTO> obtenerCarritoPorId(@Validated @RequestParam UUID id){
+        return ResponseEntity.ok(carritoService.obtenerProductoCarritoDto(id));
     }
 }

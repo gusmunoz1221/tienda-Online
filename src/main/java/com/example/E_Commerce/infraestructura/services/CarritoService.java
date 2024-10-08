@@ -3,33 +3,34 @@ package com.example.E_Commerce.infraestructura.services;
 import com.example.E_Commerce.api.DTOs.request.carrito.ProductoCarritoSolicitudDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoRespuestaDTO;
+import com.example.E_Commerce.api.DTOs.response.carrito.ProductoPedidoCarrito;
 import com.example.E_Commerce.domain.entities.CarritoEntity;
 import com.example.E_Commerce.domain.entities.ProductoEntity;
 import com.example.E_Commerce.domain.entities.UsuarioEntity;
 import com.example.E_Commerce.domain.repositories.CarritoRepository;
-import com.example.E_Commerce.domain.repositories.ProductoRepository;
 import com.example.E_Commerce.domain.repositories.UsuarioRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ArgumentoIlegalException;
-import com.example.E_Commerce.infraestructura.exceptions.ClienteNoEncontradoException;
-import com.example.E_Commerce.infraestructura.exceptions.ProductoNoEncontradoException;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
-@Slf4j
 public class CarritoService {
 
     private final CarritoRepository carritoRepository;
-    private final ProductoRepository productoRepository;
-    private final UsuarioRepository clieteRepository;
 
-    public CarritoService(CarritoRepository carritoRepository, ProductoRepository productoRepository, UsuarioRepository clieteRepository) {
+    private final ProductoService productoService;
+    private final ClienteService clienteService;
+    private final UsuarioRepository clienteRepository;
+
+    public CarritoService(CarritoRepository carritoRepository, ProductoService productoService, ClienteService clienteService, UsuarioRepository clienteRepository) {
         this.carritoRepository = carritoRepository;
-        this.productoRepository = productoRepository;
-        this.clieteRepository = clieteRepository;
+        this.productoService = productoService;
+        this.clienteService = clienteService;
+        this.clienteRepository = clienteRepository;
     }
 
     @Value("${carrito.max_productos}")
@@ -45,18 +46,13 @@ public class CarritoService {
             throw new ArgumentoIlegalException("No podemos enviar productos al país especificado. solo disponible para argentina");
 
         //busco el cliente el cual tiene el carrito asociado
-        UsuarioEntity cliente = clieteRepository.findById(productoCarritoSolicitud.getClientId())
-                .orElseThrow(() -> new ClienteNoEncontradoException("el cliente no se encontro"));
+        UsuarioEntity cliente = clienteService.obtenerClientePorId(productoCarritoSolicitud.getClientId());
 
         //obtengo el carrito mediante el cliente
         CarritoEntity carrito = cliente.getCarrito();
 
-
         //valido si el producto existe y esta disponible
-        ProductoEntity producto = productoRepository.findById(productoCarritoSolicitud.getProductoId())
-                .filter(ProductoEntity::getDisponible)
-                .orElseThrow(() -> new ProductoNoEncontradoException("El producto seleccionado no se encuentra disponible"));
-
+        ProductoEntity producto = productoService.obtenerProductoPorId(productoCarritoSolicitud.getProductoId());
 
         //seteo producto y la cantidad, utilizo la metodo sum (PF) incrementando la cantidad
        carrito.getProductos().merge(producto,productoCarritoSolicitud.getCantidad(), Integer::sum);
@@ -85,5 +81,59 @@ public class CarritoService {
         // Devolvo el DTO con la lista de productos y el precio total
         return new ProductoCarritoRespuestaDTO(productosCarritoDto, precioTotal);
 
+    }
+
+    public ProductoCarritoRespuestaDTO obtenerProductoCarritoDto(UUID id){
+
+        UsuarioEntity cliente = clienteService.obtenerClientePorId(id);
+        CarritoEntity carrito = cliente.getCarrito();
+
+        List<ProductoCarritoDTO> productosCarritoDto = carrito.getProductos()
+                .entrySet()
+                .stream()
+                .map(entry -> new ProductoCarritoDTO(
+                        entry.getKey().getNombre(),
+                        entry.getKey().getPrecio().floatValue()))
+                .toList();
+
+
+        BigDecimal precioTotal = carrito.getProductos()
+                .entrySet()
+                .stream()
+                .map(entry -> entry.getKey()
+                        .getPrecio()
+                        .multiply(new BigDecimal(entry.getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+        return new ProductoCarritoRespuestaDTO(productosCarritoDto, precioTotal);
+    }
+
+    //utilizado desde el pedidoService
+    public Pair<List<ProductoPedidoCarrito>,BigDecimal> obtenerProductoCarrito(UsuarioEntity cliente){
+
+        CarritoEntity carrito = cliente.getCarrito();
+
+        List<ProductoPedidoCarrito> productosCarritoDto = carrito.getProductos()
+                .entrySet()
+                .stream()
+                .map(entry -> new ProductoPedidoCarrito(
+                        entry.getKey().getId(),
+                        entry.getKey().getNombre(),
+                        entry.getKey().getPrecio(),
+                        entry.getValue()))
+                .toList();
+
+
+        BigDecimal precioTotal = carrito.getProductos()
+                .entrySet()
+                .stream()
+                .map(entry -> entry.getKey()
+                        .getPrecio()
+                        .multiply(new BigDecimal(entry.getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+        return  Pair.of(productosCarritoDto,precioTotal);
     }
 }
