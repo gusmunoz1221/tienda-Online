@@ -1,5 +1,6 @@
 package com.example.E_Commerce.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class CarritoEntity {
 
     @OneToOne
     @JoinColumn(name = "cliente_id")
+    @JsonBackReference // Se ignora este lado para evitar la recursión
     private UsuarioEntity cliente;
 
     //simula una tabla intermedia para poder manejar la cantidad en cada productos

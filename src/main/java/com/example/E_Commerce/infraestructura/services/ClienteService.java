@@ -48,6 +48,13 @@ public class ClienteService {
                                              .rol(Rol.CLIENTE)
                                              .build();
 
+        //creacion de carrito para setear el usuario
+        //CarritoEntity carrito = new CarritoEntity();
+        //carrito.setCliente(cliente);
+
+        //ahora seteo el carrito en cliente para asegurar que la relación bidireccional esté completamente sincronizada.
+        //cliente.setCarrito(carrito);
+cliente.getCarrito().setCliente(cliente);
         clienteRepository.save(cliente);
 
         return clienteMapper.clienteToClienteDtoRespuesta(cliente);
