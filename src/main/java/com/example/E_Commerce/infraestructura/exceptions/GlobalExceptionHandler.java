@@ -21,15 +21,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(e.getMessage(),400),HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ClienteNoEncontradoException.class)
+    @ExceptionHandler({ClienteNoEncontradoException.class,
+            CategoriaNoEncontradoException.class,
+            ProductoNoEncontradoException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<MensajeDeErrorException> manejdarorClienteNoEncontrado(HttpServletRequest request, Exception exception){
+    public ResponseEntity<MensajeDeErrorException> manejadorIdNoEncontrado(HttpServletRequest request, Exception exception){
         return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),404),HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ProductoNoEncontradoException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<MensajeDeErrorException> manejadroProductoNoEncontrado(Exception exception){
-        return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(exception.getMessage(),404),HttpStatus.NOT_FOUND);
-    }
 }

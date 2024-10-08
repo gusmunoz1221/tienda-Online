@@ -45,8 +45,7 @@ public class PedidoService {
         List<ProductoPedidoCarrito> productosCarrito = datosProductos.getLeft();
         BigDecimal precioTotal = datosProductos.getRight();
 
-        //divido la lista del precio total para iterarla
-        List<ProductoPedidoCarrito> listaproductosCarrito = productosCarrito;
+
 
         //seteo el cliente al pedido junto con la fecha que lo realizo
         pedido.setCliente(cliente);
@@ -62,7 +61,7 @@ public class PedidoService {
         int cantidadDeProductosEnPedido=0;
 
         //recorro la lista de productos obtenida del carrito
-        for(ProductoPedidoCarrito productoCarrito : listaproductosCarrito){
+        for(ProductoPedidoCarrito productoCarrito : productosCarrito){
 
             //obtengo el producto mediante el id del producto guardado en la lista
             ProductoEntity producto = productoService.obtenerProductoPorId(productoCarrito.getId());

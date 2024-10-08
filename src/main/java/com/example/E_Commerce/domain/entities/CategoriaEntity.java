@@ -20,8 +20,4 @@ public class CategoriaEntity {
     private Long id;
 
     private String nombre;
-
-    @OneToMany(mappedBy = "categoria")
-    private List<ProductoEntity> productos;
-
 }

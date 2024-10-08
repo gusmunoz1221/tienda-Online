@@ -1,5 +1,8 @@
 package com.example.E_Commerce.infraestructura.services;
 
+import com.example.E_Commerce.api.DTOs.request.producto.ProdutoSolicitudDTO;
+import com.example.E_Commerce.api.DTOs.response.producto.ProductoRespuestaDTO;
+import com.example.E_Commerce.domain.entities.CategoriaEntity;
 import com.example.E_Commerce.domain.entities.ProductoEntity;
 import com.example.E_Commerce.domain.repositories.ProductoRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ProductoNoEncontradoException;
@@ -9,11 +12,31 @@ import org.springframework.stereotype.Service;
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final CategoriaService categoriaService;
 
-    public ProductoService(ProductoRepository productoRepository) {
+    public ProductoService(ProductoRepository productoRepository, CategoriaService categoriaService) {
         this.productoRepository = productoRepository;
+        this.categoriaService = categoriaService;
     }
+    
 
+    public ProductoRespuestaDTO agregarProducto(ProdutoSolicitudDTO productoSolicitud){
+
+      CategoriaEntity categoria = categoriaService.obtenerCategoriaPorId(productoSolicitud.getCategoriaId());
+
+     ProductoEntity producto = ProductoEntity.builder()
+             .nombre(productoSolicitud.getNombre())
+             .descripcion(productoSolicitud.getDescripcion())
+             .precio(productoSolicitud.getPrecio())
+             .stock(productoSolicitud.getStock())
+             .categoria(categoria).build();
+
+    return (ProductoRespuestaDTO.builder().nombre(producto.getNombre())
+             .descripcion(producto.getDescripcion())
+             .precio(producto.getPrecio())
+             .stock(producto.getStock())
+             .categoria(producto.getCategoria())).build();
+    }
     public ProductoEntity obtenerProductoPorId(Long id){
         return productoRepository.findById(id)
                 .filter(ProductoEntity::getDisponible)
