@@ -29,4 +29,6 @@ public class ProductoEntity {
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private CategoriaEntity categoria;
+
+
 }

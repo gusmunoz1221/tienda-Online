@@ -1,6 +1,7 @@
 package com.example.E_Commerce.domain.entities;
 
 import com.example.E_Commerce.domain.Rol;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Builder
 @Data
 @Entity
-@Table(name = "cliente")
+@Table(name = "usuario")
 public class UsuarioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,6 +32,7 @@ public class UsuarioEntity {
     boolean habilitado;
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private CarritoEntity carrito;
 
     @OneToMany(

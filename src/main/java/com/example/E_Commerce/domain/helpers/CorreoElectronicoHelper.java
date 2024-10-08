@@ -2,6 +2,7 @@ package com.example.E_Commerce.domain.helpers;
 
 import com.example.E_Commerce.domain.entities.PedidoEntity;
 import com.example.E_Commerce.domain.entities.ProductoEntity;
+import com.example.E_Commerce.domain.entities.ProductoPedidoEntity;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;

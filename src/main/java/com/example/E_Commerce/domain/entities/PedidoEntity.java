@@ -21,15 +21,14 @@ public class PedidoEntity {
     private Long id;
 
     private Date fecha;
-    private Integer numeroDePedido;
+    private String numeroDePedido;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private UsuarioEntity cliente;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY) // evita carga innecesaria de datos cuando no son requeridos.
-    @JoinColumn(name = "pedido_id")
-    private List<ProductoEntity> productos;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductoPedidoEntity> productos;
 
     @OneToOne(cascade = CascadeType.ALL)
     private PagoEntity pago;

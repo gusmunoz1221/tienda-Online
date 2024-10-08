@@ -48,6 +48,13 @@ public class ClienteService {
                                              .rol(Rol.CLIENTE)
                                              .build();
 
+        //creacion de carrito para setear el usuario
+        //CarritoEntity carrito = new CarritoEntity();
+        //carrito.setCliente(cliente);
+
+        //ahora seteo el carrito en cliente para asegurar que la relación bidireccional esté completamente sincronizada.
+        //cliente.setCarrito(carrito);
+cliente.getCarrito().setCliente(cliente);
         clienteRepository.save(cliente);
 
         return clienteMapper.clienteToClienteDtoRespuesta(cliente);
@@ -55,11 +62,18 @@ public class ClienteService {
 
 
     //encuentro el cliente y y lo retorno directamente mapeandolo a DTO
-    public ClienteRespuestaDTO obtenerClientePorId(UUID id){
+    public ClienteRespuestaDTO obtenerClientePorIdDto(UUID id){
 
         return clienteMapper.clienteToClienteDtoRespuesta(
                 clienteRepository.findById(id)
                                  .orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado")));
+    }
+
+
+    public UsuarioEntity obtenerClientePorId(UUID id){
+
+        return clienteRepository.findById(id)
+                        .orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
     }
 
 
