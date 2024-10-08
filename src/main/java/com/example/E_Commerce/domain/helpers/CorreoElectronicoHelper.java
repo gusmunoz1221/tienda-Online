@@ -2,6 +2,7 @@ package com.example.E_Commerce.domain.helpers;
 
 import com.example.E_Commerce.domain.entities.PedidoEntity;
 import com.example.E_Commerce.domain.entities.ProductoEntity;
+import com.example.E_Commerce.domain.entities.ProductoPedidoEntity;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -46,7 +47,7 @@ public class CorreoElectronicoHelper {
     public  void enviarCorreoCompraDeProducto(String destinatario,
                                               String nombre,
                                               List<ProductoEntity> productos,
-                                              PedidoEntity pedido,
+                                              ProductoPedidoEntity pedido,
                                               String numeroDePedido){
 
         MimeMessage mensaje = correoRemitente.createMimeMessage();
@@ -75,7 +76,7 @@ public class CorreoElectronicoHelper {
 
     private String leerHtmlProductosComprado (String nombre,
                                               List<ProductoEntity> productos,
-                                              PedidoEntity pedido,
+                                              ProductoPedidoEntity pedido,
                                               String numeroDePedido){
 
         String productosEnHtml = reemplazarProductosEnHtml(productos); //remplazo los productos en html
