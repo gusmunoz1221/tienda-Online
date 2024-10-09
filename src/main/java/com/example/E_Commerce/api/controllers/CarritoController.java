@@ -1,49 +1,25 @@
 package com.example.E_Commerce.api.controllers;
 
-
-import com.example.E_Commerce.api.DTOs.request.carrito.ProductoCarritoSolicitudDTO;
-import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoRespuestaDTO;
-import com.example.E_Commerce.infraestructura.services.CarritoService;
-import jakarta.validation.Valid;
+import com.example.E_Commerce.api.DTOs.response.pedido.ProductosPedidoRespuestaDTO;
+import com.example.E_Commerce.infraestructura.services.PedidoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/carrito")
-public class CarritoController {
+@RequestMapping("/pedido")
+public class PedidoController {
 
-    private final CarritoService carritoService;
+    private final PedidoService pedidoService;
 
-    public CarritoController(CarritoService carritoService) {
-        this.carritoService = carritoService;
+    public PedidoController(PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> agregarProductoCarrito(@Valid @RequestBody @Validated ProductoCarritoSolicitudDTO producto, BindingResult resultado){
-
-        if(resultado.hasErrors()){
-            List<FieldError> campoDeErrores = resultado.getFieldErrors();
-            Map<String,String> errores = new HashMap<>();
-
-            for(FieldError error : campoDeErrores)
-                errores.put(error.getField(),error.getDefaultMessage());
-
-         return ResponseEntity.badRequest().body(errores);
-        }
-
-        return ResponseEntity.ok(carritoService.agregarProductoCarrito(producto));
-    }
-
-    @GetMapping
-    public ResponseEntity<ProductoCarritoRespuestaDTO> obtenerCarritoPorId(@Validated @RequestParam UUID id){
-        return ResponseEntity.ok(carritoService.obtenerProductoCarritoDto(id));
+    @PostMapping("{id}")
+    ResponseEntity<ProductosPedidoRespuestaDTO> agregarPedidoCarrito(@Validated @PathVariable UUID id){
+        return ResponseEntity.ok(pedidoService.agregarPedidoCarrito(id));
     }
 }

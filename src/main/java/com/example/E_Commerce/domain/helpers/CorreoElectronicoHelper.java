@@ -47,7 +47,7 @@ public class CorreoElectronicoHelper {
     public  void enviarCorreoCompraDeProducto(String destinatario,
                                               String nombre,
                                               List<ProductoEntity> productos,
-                                              PedidoEntity pedido,
+                                              ProductoPedidoEntity pedido,
                                               String numeroDePedido){
 
         MimeMessage mensaje = correoRemitente.createMimeMessage();
@@ -76,7 +76,7 @@ public class CorreoElectronicoHelper {
 
     private String leerHtmlProductosComprado (String nombre,
                                               List<ProductoEntity> productos,
-                                              PedidoEntity pedido,
+                                              ProductoPedidoEntity pedido,
                                               String numeroDePedido){
 
         String productosEnHtml = reemplazarProductosEnHtml(productos); //remplazo los productos en html
