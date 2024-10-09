@@ -13,13 +13,11 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "produco_pedido")
+@Entity(name = "producto_pedido")
 public class ProductoPedidoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private Date fecha;
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")

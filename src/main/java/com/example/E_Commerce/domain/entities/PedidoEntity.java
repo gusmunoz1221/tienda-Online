@@ -20,6 +20,8 @@ public class PedidoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Date fecha;
+    private String numeroDePedido;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")

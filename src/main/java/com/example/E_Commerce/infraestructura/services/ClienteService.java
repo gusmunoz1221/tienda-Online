@@ -62,11 +62,18 @@ cliente.getCarrito().setCliente(cliente);
 
 
     //encuentro el cliente y y lo retorno directamente mapeandolo a DTO
-    public ClienteRespuestaDTO obtenerClientePorId(UUID id){
+    public ClienteRespuestaDTO obtenerClientePorIdDto(UUID id){
 
         return clienteMapper.clienteToClienteDtoRespuesta(
                 clienteRepository.findById(id)
                                  .orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado")));
+    }
+
+
+    public UsuarioEntity obtenerClientePorId(UUID id){
+
+        return clienteRepository.findById(id)
+                        .orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
     }
 
 

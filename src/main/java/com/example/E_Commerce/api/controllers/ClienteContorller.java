@@ -44,7 +44,7 @@ public class ClienteContorller {
 
     @GetMapping("{id}")
     ResponseEntity<ClienteRespuestaDTO> obtenerClientePorId(@PathVariable UUID id){
-        return ResponseEntity.ok(clienteService.obtenerClientePorId(id));
+        return ResponseEntity.ok(clienteService.obtenerClientePorIdDto(id));
     }
 
     @PutMapping("{id}")
