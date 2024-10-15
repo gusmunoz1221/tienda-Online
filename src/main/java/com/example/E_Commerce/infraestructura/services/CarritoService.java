@@ -6,18 +6,24 @@ import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoRespuesta
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoPedidoCarrito;
 import com.example.E_Commerce.domain.entities.CarritoEntity;
 import com.example.E_Commerce.domain.entities.ProductoEntity;
+import com.example.E_Commerce.domain.entities.ProductoPedidoEntity;
 import com.example.E_Commerce.domain.entities.UsuarioEntity;
 import com.example.E_Commerce.domain.repositories.CarritoRepository;
 import com.example.E_Commerce.domain.repositories.UsuarioRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ArgumentoIlegalException;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class CarritoService {
 
     private final CarritoRepository carritoRepository;
@@ -83,12 +89,11 @@ public class CarritoService {
 
     }
 
-    public ProductoCarritoRespuestaDTO obtenerProductoCarritoDto(UUID id){
+    public ProductoCarritoRespuestaDTO obtenerCarritoPorId(UUID id){
 
         UsuarioEntity cliente = clienteService.obtenerClientePorId(id);
-        CarritoEntity carrito = cliente.getCarrito();
 
-        List<ProductoCarritoDTO> productosCarritoDto = carrito.getProductos()
+        List<ProductoCarritoDTO> productosCarritoDto = cliente.getCarrito().getProductos()
                 .entrySet()
                 .stream()
                 .map(entry -> new ProductoCarritoDTO(
@@ -97,7 +102,7 @@ public class CarritoService {
                 .toList();
 
 
-        BigDecimal precioTotal = carrito.getProductos()
+        BigDecimal precioTotal = cliente.getCarrito().getProductos()
                 .entrySet()
                 .stream()
                 .map(entry -> entry.getKey()
@@ -110,7 +115,7 @@ public class CarritoService {
     }
 
     //utilizado desde el pedidoService
-    public Pair<List<ProductoPedidoCarrito>,BigDecimal> obtenerProductoCarrito(UsuarioEntity cliente){
+    public Pair<List<ProductoPedidoCarrito>,BigDecimal> obtenerProductosCarrito(UsuarioEntity cliente){
 
         CarritoEntity carrito = cliente.getCarrito();
 
@@ -135,5 +140,35 @@ public class CarritoService {
 
 
         return  Pair.of(productosCarritoDto,precioTotal);
+    }
+
+    public void eliminarCarrito(UUID id){
+
+        UsuarioEntity cliente = clienteService.obtenerClientePorId(id);
+
+        CarritoEntity carrito = cliente.getCarrito();
+
+        // Limpio el Map de productos
+        carrito.getProductos().clear();
+
+        //Guardo el carrito para que se refleje en la base de datos
+        carritoRepository.save(carrito);
+
+    }
+
+    @Transactional
+    public void eliminarCarritoPorPedido(List<ProductoEntity> productosParaEliminar,UsuarioEntity cliente){
+
+        Map<ProductoEntity,Integer> productos = cliente.getCarrito().getProductos();
+
+        productosParaEliminar.forEach(producto ->
+                productos.
+                entrySet().
+                removeIf(entry -> entry.getKey().equals(producto))
+        );
+
+        //libero la lista para que GC limpie el monticulo
+        productosParaEliminar=null;
+
     }
 }

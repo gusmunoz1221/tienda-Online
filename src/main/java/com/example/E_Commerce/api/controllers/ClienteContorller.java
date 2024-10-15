@@ -25,8 +25,11 @@ public class ClienteContorller {
         this.clienteService = clienteService;
     }
 
+
+
     @PostMapping
-    public ResponseEntity<?> agregarCliente(@Valid @RequestBody @Validated ClienteSolicitudDTO clienteDto, BindingResult resultado){
+    public ResponseEntity<?> agregarCliente(@Valid @RequestBody @Validated ClienteSolicitudDTO clienteDto,
+                                            BindingResult resultado){
 
         if (resultado.hasErrors()){
             List<FieldError> campoDeErrores = resultado.getFieldErrors();
@@ -42,13 +45,16 @@ public class ClienteContorller {
         return ResponseEntity.ok(clienteService.agregarCliente(clienteDto));
     }
 
+
     @GetMapping("{id}")
     ResponseEntity<ClienteRespuestaDTO> obtenerClientePorId(@PathVariable UUID id){
         return ResponseEntity.ok(clienteService.obtenerClientePorIdDto(id));
     }
 
+
     @PutMapping("{id}")
-    ResponseEntity<ClienteRespuestaDTO> actualizarDatosCliente(@PathVariable UUID id, @Valid @RequestBody ClienteSolicitudDTO clienteDto){
+    ResponseEntity<ClienteRespuestaDTO> actualizarDatosCliente(@PathVariable UUID id,
+                                                               @Valid @RequestBody ClienteSolicitudDTO clienteDto){
         return ResponseEntity.ok(clienteService.actualizarDatosCliente(id,clienteDto));
     }
 

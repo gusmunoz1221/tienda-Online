@@ -10,7 +10,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,8 @@ public class CarritoController {
     public CarritoController(CarritoService carritoService) {
         this.carritoService = carritoService;
     }
+
+
 
     @PostMapping
     public ResponseEntity<?> agregarProductoCarrito(@Valid @RequestBody @Validated ProductoCarritoSolicitudDTO producto, BindingResult resultado){
@@ -42,8 +43,17 @@ public class CarritoController {
         return ResponseEntity.ok(carritoService.agregarProductoCarrito(producto));
     }
 
+
     @GetMapping
     public ResponseEntity<ProductoCarritoRespuestaDTO> obtenerCarritoPorId(@Validated @RequestParam UUID id){
-        return ResponseEntity.ok(carritoService.obtenerProductoCarritoDto(id));
+        return ResponseEntity.ok(carritoService.obtenerCarritoPorId(id));
+    }
+
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> elimianarCarrito(@Validated @PathVariable UUID id){
+
+        carritoService.eliminarCarrito(id);
+        return ResponseEntity.noContent().build();
     }
 }

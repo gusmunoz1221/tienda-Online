@@ -7,6 +7,7 @@ import com.example.E_Commerce.domain.entities.*;
 import com.example.E_Commerce.domain.repositories.PedidoRepository;
 import com.example.E_Commerce.domain.repositories.ProductoRepository;
 import com.example.E_Commerce.domain.repositories.SecuenciaPedidoRepository;
+import com.example.E_Commerce.infraestructura.exceptions.ProductoNoEncontradoException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
@@ -33,18 +34,18 @@ public class PedidoService {
         this.productoRepository = productoRepository;
     }
 
-    public ProductosPedidoRespuestaDTO agregarPedidoCarrito(UUID id){
+    public ProductosPedidoRespuestaDTO agregarPedidoCarrito(UUID id) {
 
         UsuarioEntity cliente = clienteService.obtenerClientePorId(id);
 
         PedidoEntity pedido = new PedidoEntity();
 
         //obtengo la lista del carrito junto con el precio total de la lista
-        Pair<List<ProductoPedidoCarrito>,BigDecimal> datosProductos = carritoService.obtenerProductoCarrito(cliente);
+        Pair<List<ProductoPedidoCarrito>, BigDecimal> datosProductos = carritoService.obtenerProductosCarrito(cliente);
 
+        //separo la tupla
         List<ProductoPedidoCarrito> productosCarrito = datosProductos.getLeft();
         BigDecimal precioTotal = datosProductos.getRight();
-
 
 
         //seteo el cliente al pedido junto con la fecha que lo realizo
@@ -55,39 +56,67 @@ public class PedidoService {
 
         pedido.setNumeroDePedido(numeroPedido);
 
+        //creo la lista que voy a voy a persistir en ProductoPedidoEntity, que contiene todos los productos pedidos
         List<ProductoPedidoEntity> productosPedido = new ArrayList<>();
 
         //contador de productos para no hacer nueva consulta a BD
-        int cantidadDeProductosEnPedido=0;
+        int cantidadDeProductosEnPedido = 0;
+
+
+        //productosParaEliminiar son todos los prodcutos que se van a vaciar en el carrito
+        List<ProductoEntity> productosParaEliminar = new ArrayList<>();
+
+        //productos no disponibles:
+        List<String> productosNoDisponibles = new ArrayList<>();
 
         //recorro la lista de productos obtenida del carrito
-        for(ProductoPedidoCarrito productoCarrito : productosCarrito){
+        for (ProductoPedidoCarrito productoCarrito : productosCarrito) {
 
             //obtengo el producto mediante el id del producto guardado en la lista
             ProductoEntity producto = productoService.obtenerProductoPorId(productoCarrito.getId());
-            ProductoPedidoEntity productoPedido =  ProductoPedidoEntity.builder()
-                    .pedido(pedido)
-                    .producto(producto)
-                    .cantidad(productoCarrito.getCantidad()).build();
 
-            //cuanto la cantidad de productos en el carrito
-            cantidadDeProductosEnPedido+=productoCarrito.getCantidad();
+            if (!productoService.estaDisponible(producto, productoCarrito.getCantidad()))
+                productosNoDisponibles.add("El producto " + producto.getNombre() + " no tiene stock suficiente. Stock disponible: " + producto.getStock());
+            else {
+                //  throw new ProductoNoEncontradoException("lo sentimos. el producto: " + producto.getNombre() + " no esta disponible temporalmente");
+                // }
 
-            //seteo la entity de producto en producto_pedido
-            productosPedido.add(productoPedido);
 
-            ProductosPedidoRespuestaDTO.builder().numeroDePedido(pedido.getNumeroDePedido()).percioTotal(precioTotal);
+                productosParaEliminar.add(producto);
+
+                ProductoPedidoEntity productoPedido = ProductoPedidoEntity.builder()
+                        .pedido(pedido)
+                        .producto(producto)
+                        .cantidad(productoCarrito.getCantidad())
+                        .build();
+
+                //cuanto la cantidad de productos en el carrito
+                cantidadDeProductosEnPedido += productoCarrito.getCantidad();
+
+                //seteo la entity de producto en producto_pedido
+                productosPedido.add(productoPedido);
+
+                ProductosPedidoRespuestaDTO.builder()
+                        .numeroDePedido(pedido.getNumeroDePedido())
+                        .percioTotal(precioTotal);
+            }
 
         }
 
+        if (!productosNoDisponibles.isEmpty())
+            // Si hay problemas, lanzo una excepción con la lista de productos no disponibles
+            throw new ProductoNoEncontradoException("Problemas con algunos productos: " + String.join(", ", productosNoDisponibles));
 
         pedido.setProductos(productosPedido);
 
+        //elimino los productos del carrito
+        carritoService.eliminarCarritoPorPedido(productosParaEliminar, cliente);
         pedidoRepository.save(pedido);
+
 
         // creamos un nuevo dto que contiene una lista de PedidoCarritoRespuestaDTO
         // mapeamos una lista de productos entities a una lista PedidoCarritoRespuestaDTO;
-        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(), pedido.getFecha(),cantidadDeProductosEnPedido,precioTotal,
+        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(), pedido.getFecha(), cantidadDeProductosEnPedido, precioTotal,
                 pedido.getProductos()
                         .stream()
                         .map(producto -> new PedidoCarritoRespuestaDTO(
@@ -96,6 +125,7 @@ public class PedidoService {
                         .toList()
         );
     }
+
     public String generarNumeroPedido() {
         SecuenciaPedidoEntity secuencia = secuenciaPedidoRepository.findById(1L).orElseThrow();
         secuencia.setUltimoNumero(secuencia.getUltimoNumero() + 1);

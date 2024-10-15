@@ -72,8 +72,8 @@ cliente.getCarrito().setCliente(cliente);
 
     public UsuarioEntity obtenerClientePorId(UUID id){
 
-        return clienteRepository.findById(id)
-                        .orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
+       return clienteRepository.findById(id)
+                .orElseThrow(() -> new ClienteNoEncontradoException("cliente no encontrado"));
     }
 
 

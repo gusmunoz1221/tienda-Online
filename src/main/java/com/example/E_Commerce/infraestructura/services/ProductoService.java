@@ -42,4 +42,21 @@ public class ProductoService {
                 .filter(ProductoEntity::getDisponible)
                 .orElseThrow(() -> new ProductoNoEncontradoException("El producto seleccionado no se encuentra disponible"));
     }
+
+    public boolean estaDisponible(ProductoEntity producto, int cantidad){
+
+        if(!producto.getDisponible())
+            return false;
+
+        else if (producto.getStock()>=cantidad)
+            producto.setStock(producto.getStock()-cantidad);
+
+            if(producto.getStock()==0)
+                producto.setDisponible(false);
+
+        productoRepository.save(producto);
+
+        //se desconto el stock y se pudo realizar el pedido
+        return true;
+    }
 }
