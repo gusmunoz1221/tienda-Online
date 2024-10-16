@@ -1,15 +1,17 @@
 package com.example.E_Commerce.infraestructura.services;
 
+import com.example.E_Commerce.api.DTOs.request.PedidoProductoSolicitudDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoPedidoCarrito;
 import com.example.E_Commerce.api.DTOs.response.pedido.PedidoCarritoRespuestaDTO;
 import com.example.E_Commerce.api.DTOs.response.pedido.ProductosPedidoRespuestaDTO;
 import com.example.E_Commerce.domain.entities.*;
 import com.example.E_Commerce.domain.repositories.PedidoRepository;
-import com.example.E_Commerce.domain.repositories.ProductoRepository;
 import com.example.E_Commerce.domain.repositories.SecuenciaPedidoRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ProductoNoEncontradoException;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,21 +26,20 @@ public class PedidoService {
     private final ProductoService productoService;
     private final ClienteService clienteService;
     private final SecuenciaPedidoRepository secuenciaPedidoRepository;
-    private final ProductoRepository productoRepository;
-    public PedidoService(PedidoRepository pedidoRepository, CarritoService carritoService, ProductoService productoService, ClienteService clienteService, SecuenciaPedidoRepository secuenciaPedidoRepository, ProductoRepository productoRepository) {
+
+
+    public PedidoService(PedidoRepository pedidoRepository, CarritoService carritoService, ProductoService productoService, ClienteService clienteService, SecuenciaPedidoRepository secuenciaPedidoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.carritoService = carritoService;
         this.productoService = productoService;
         this.clienteService = clienteService;
         this.secuenciaPedidoRepository = secuenciaPedidoRepository;
-        this.productoRepository = productoRepository;
     }
 
+    @Transactional
     public ProductosPedidoRespuestaDTO agregarPedidoCarrito(UUID id) {
 
         UsuarioEntity cliente = clienteService.obtenerClientePorId(id);
-
-        PedidoEntity pedido = new PedidoEntity();
 
         //obtengo la lista del carrito junto con el precio total de la lista
         Pair<List<ProductoPedidoCarrito>, BigDecimal> datosProductos = carritoService.obtenerProductosCarrito(cliente);
@@ -49,12 +50,11 @@ public class PedidoService {
 
 
         //seteo el cliente al pedido junto con la fecha que lo realizo
-        pedido.setCliente(cliente);
-        pedido.setFecha(new Date());
-
-        String numeroPedido = generarNumeroPedido();
-
-        pedido.setNumeroDePedido(numeroPedido);
+        PedidoEntity pedido = PedidoEntity.builder()
+                .cliente(cliente)
+                .fecha(new Date())
+                .numeroDePedido(generarNumeroPedido())
+                .build();
 
         //creo la lista que voy a voy a persistir en ProductoPedidoEntity, que contiene todos los productos pedidos
         List<ProductoPedidoEntity> productosPedido = new ArrayList<>();
@@ -78,9 +78,6 @@ public class PedidoService {
             if (!productoService.estaDisponible(producto, productoCarrito.getCantidad()))
                 productosNoDisponibles.add("El producto " + producto.getNombre() + " no tiene stock suficiente. Stock disponible: " + producto.getStock());
             else {
-                //  throw new ProductoNoEncontradoException("lo sentimos. el producto: " + producto.getNombre() + " no esta disponible temporalmente");
-                // }
-
 
                 productosParaEliminar.add(producto);
 
@@ -96,34 +93,79 @@ public class PedidoService {
                 //seteo la entity de producto en producto_pedido
                 productosPedido.add(productoPedido);
 
-                ProductosPedidoRespuestaDTO.builder()
-                        .numeroDePedido(pedido.getNumeroDePedido())
-                        .percioTotal(precioTotal);
             }
-
         }
 
-        if (!productosNoDisponibles.isEmpty())
-            // Si hay problemas, lanzo una excepción con la lista de productos no disponibles
-            throw new ProductoNoEncontradoException("Problemas con algunos productos: " + String.join(", ", productosNoDisponibles));
+        if (!productosNoDisponibles.isEmpty()) {
+            StringBuilder mensajeError = new StringBuilder("Problemas con algunos productos:");
 
+            // Concatenar cada mensaje de productos no disponibles
+            for (String mensaje : productosNoDisponibles) {
+                mensajeError.append(mensaje);
+            }
+
+            // Lanzo la excepción con el mensaje concatenado
+            throw new ProductoNoEncontradoException(mensajeError.toString());
+         }
+            pedido.setProductos(productosPedido);
+
+
+            //elimino los productos del carrito
+            carritoService.eliminarCarritoPorPedido(productosParaEliminar, cliente);
+            pedidoRepository.save(pedido);
+
+
+            // creamos un nuevo dto que contiene una lista de PedidoCarritoRespuestaDTO
+            // mapeamos una lista de productos entities a una lista PedidoCarritoRespuestaDTO;
+            return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(), pedido.getFecha(), cantidadDeProductosEnPedido, precioTotal,
+                    pedido.getProductos()
+                            .stream()
+                            .map(producto -> new PedidoCarritoRespuestaDTO(
+                                    producto.getProducto().getNombre(),
+                                    producto.getProducto().getPrecio().floatValue()))
+                            .toList()
+            );
+        }
+
+
+    public ProductosPedidoRespuestaDTO agregarPedidoProducto(PedidoProductoSolicitudDTO pedidoProductoSolicitud){
+
+        UsuarioEntity cliente = clienteService.obtenerClientePorId(pedidoProductoSolicitud.getId());
+
+        ProductoEntity producto = productoService.obtenerProductoPorId(pedidoProductoSolicitud.getIdProducto());
+
+       if(!productoService.estaDisponible(producto,pedidoProductoSolicitud.getCantidad()))
+           throw new IllegalArgumentException("el producto no tiene stock suficiente, stock dispinible: "+producto.getStock());
+
+
+        //seteo el cliente al pedido junto con la fecha que lo realizo
+       PedidoEntity pedido = PedidoEntity.builder()
+               .cliente(cliente)
+               .fecha(new Date())
+               .numeroDePedido(generarNumeroPedido())
+               .build();
+
+        List<ProductoPedidoEntity> productosPedido = new ArrayList<>();
+
+        ProductoPedidoEntity productoPedido = ProductoPedidoEntity.builder()
+                .pedido(pedido)
+                .producto(producto)
+                .cantidad(pedidoProductoSolicitud.getCantidad())
+                .build();
+
+        productosPedido.add(productoPedido);
+
+        // 7. Asigno lista de productos al pedido
         pedido.setProductos(productosPedido);
 
-        //elimino los productos del carrito
-        carritoService.eliminarCarritoPorPedido(productosParaEliminar, cliente);
         pedidoRepository.save(pedido);
 
-
-        // creamos un nuevo dto que contiene una lista de PedidoCarritoRespuestaDTO
-        // mapeamos una lista de productos entities a una lista PedidoCarritoRespuestaDTO;
-        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(), pedido.getFecha(), cantidadDeProductosEnPedido, precioTotal,
-                pedido.getProductos()
-                        .stream()
-                        .map(producto -> new PedidoCarritoRespuestaDTO(
-                                producto.getProducto().getNombre(),
-                                producto.getProducto().getPrecio().floatValue()))
-                        .toList()
-        );
+        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(),pedido.getFecha(), pedidoProductoSolicitud.getCantidad(), producto.getPrecio(),pedido.getProductos()
+                .stream()
+                .map(productoPedidoEntity -> new PedidoCarritoRespuestaDTO(
+                        productoPedidoEntity.getProducto().getNombre(),
+                        productoPedidoEntity.getProducto().getPrecio().floatValue()))
+                .toList());
     }
 
     public String generarNumeroPedido() {

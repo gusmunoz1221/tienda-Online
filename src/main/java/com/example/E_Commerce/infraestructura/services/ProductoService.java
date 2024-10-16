@@ -43,20 +43,30 @@ public class ProductoService {
                 .orElseThrow(() -> new ProductoNoEncontradoException("El producto seleccionado no se encuentra disponible"));
     }
 
-    public boolean estaDisponible(ProductoEntity producto, int cantidad){
-
-        if(!producto.getDisponible())
+    public boolean estaDisponible(ProductoEntity producto, int cantidad) {
+        // Primero verificamos si el producto está disponible
+        if (!producto.getDisponible()){
             return false;
+        }
 
-        else if (producto.getStock()>=cantidad)
-            producto.setStock(producto.getStock()-cantidad);
+        // Verificamos si hay stock suficiente
+        if (producto.getStock() >= cantidad){
 
-            if(producto.getStock()==0)
+            producto.setStock(producto.getStock() - cantidad);
+
+
+            if (producto.getStock() == 0) {
                 producto.setDisponible(false);
+            }
 
-        productoRepository.save(producto);
+            productoRepository.save(producto);
 
-        //se desconto el stock y se pudo realizar el pedido
-        return true;
+            // retorno true indicando que el producto fue procesado
+            return true;
+        }
+
+        // Si no hay stock suficiente, retornamos false
+        return false;
     }
+
 }

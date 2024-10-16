@@ -156,7 +156,7 @@ public class CarritoService {
 
     }
 
-    @Transactional
+
     public void eliminarCarritoPorPedido(List<ProductoEntity> productosParaEliminar,UsuarioEntity cliente){
 
         Map<ProductoEntity,Integer> productos = cliente.getCarrito().getProductos();

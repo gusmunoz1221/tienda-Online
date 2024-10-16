@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(e.getMessage(),409), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(ArgumentoIlegalException.class)
+    @ExceptionHandler({ArgumentoIlegalException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<MensajeDeErrorException> manejadorArgumentoIlegal(Exception e){
         return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(e.getMessage(),400),HttpStatus.BAD_REQUEST);
