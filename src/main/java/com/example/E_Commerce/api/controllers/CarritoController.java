@@ -1,6 +1,7 @@
 package com.example.E_Commerce.api.controllers;
 
 
+import com.example.E_Commerce.api.DTOs.request.carrito.ModificarProductoCarritoDTO;
 import com.example.E_Commerce.api.DTOs.request.carrito.ProductoCarritoSolicitudDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoRespuestaDTO;
 import com.example.E_Commerce.infraestructura.services.CarritoService;
@@ -44,8 +45,8 @@ public class CarritoController {
     }
 
 
-    @GetMapping
-    public ResponseEntity<ProductoCarritoRespuestaDTO> obtenerCarritoPorId(@Validated @RequestParam UUID id){
+    @GetMapping("{id}")
+    public ResponseEntity<ProductoCarritoRespuestaDTO> obtenerCarritoPorId(@Validated @PathVariable UUID id){
         return ResponseEntity.ok(carritoService.obtenerCarritoPorId(id));
     }
 
@@ -56,4 +57,10 @@ public class CarritoController {
         carritoService.eliminarCarrito(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ProductoCarritoRespuestaDTO> modificarCantidadProducto(@Validated @PathVariable UUID id, @RequestBody ModificarProductoCarritoDTO producto){
+        return ResponseEntity.ok(carritoService.modificarCantidadProducto(id,producto));
+    }
+
 }

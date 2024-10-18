@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class AdministradorSolicitudDTO {
 
     @Size(min = 5, max = 30,message = "la longitud minima del nombre es 3(tres)")

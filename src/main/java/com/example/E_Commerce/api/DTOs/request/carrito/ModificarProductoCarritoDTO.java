@@ -1,17 +1,13 @@
-package com.example.E_Commerce.api.DTOs.request;
+package com.example.E_Commerce.api.DTOs.request.carrito;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PedidoProductoSolicitudDTO {
-    UUID id;
+public class ModificarProductoCarritoDTO {
     Long idProducto;
     int cantidad;
 }

@@ -1,5 +1,6 @@
 package com.example.E_Commerce.infraestructura.services;
 
+import com.example.E_Commerce.api.DTOs.request.carrito.ModificarProductoCarritoDTO;
 import com.example.E_Commerce.api.DTOs.request.carrito.ProductoCarritoSolicitudDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoRespuestaDTO;
@@ -170,5 +171,40 @@ public class CarritoService {
         //libero la lista para que GC limpie el monticulo
         productosParaEliminar=null;
 
+    }
+
+    public ProductoCarritoRespuestaDTO modificarCantidadProducto(UUID id, ModificarProductoCarritoDTO productoDto){
+
+        UsuarioEntity cliente = clienteService.obtenerClientePorId(id);
+
+        CarritoEntity carrito = cliente.getCarrito();
+
+        ProductoEntity producto = productoService.obtenerProductoPorId(productoDto.getIdProducto());
+
+        //se supone que el producto ya esta en el carrito
+        carrito.getProductos().put(producto,productoDto.getCantidad());
+
+        carritoRepository.save(carrito);
+
+
+        List<ProductoCarritoDTO> productosCarritoDto = cliente.getCarrito().getProductos()
+                .entrySet()
+                .stream()
+                .map(entry -> new ProductoCarritoDTO(
+                        entry.getKey().getNombre(),
+                        entry.getKey().getPrecio().floatValue()))
+                .toList();
+
+
+        BigDecimal precioTotal = cliente.getCarrito().getProductos()
+                .entrySet()
+                .stream()
+                .map(entry -> entry.getKey()
+                        .getPrecio()
+                        .multiply(new BigDecimal(entry.getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+        return new ProductoCarritoRespuestaDTO(productosCarritoDto, precioTotal);
     }
 }

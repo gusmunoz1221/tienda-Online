@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(CorreoDuplicadolException.class)
+    @ExceptionHandler({CorreoDuplicadolException.class,ConflictoDePagoException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<MensajeDeErrorException> manejadorCorreoDuplicado(Exception e ){
         return new ResponseEntity<MensajeDeErrorException>(new MensajeDeErrorException(e.getMessage(),409), HttpStatus.CONFLICT);

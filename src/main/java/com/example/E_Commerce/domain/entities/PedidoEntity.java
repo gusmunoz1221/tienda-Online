@@ -1,5 +1,6 @@
 package com.example.E_Commerce.domain.entities;
 
+import com.example.E_Commerce.domain.EstadoPedido;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,9 @@ public class PedidoEntity {
 
     private Date fecha;
     private String numeroDePedido;
+
+    @Enumerated(EnumType.STRING)
+    private EstadoPedido estado;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")

@@ -22,7 +22,7 @@ public class InicializacionDeDatos implements CommandLineRunner {
     private void inicializarSecuenciaPedido() {
         if (!secuenciaPedidoRepository.existsById(1L)) {
             SecuenciaPedidoEntity secuencia = new SecuenciaPedidoEntity();
-            secuencia.setUltimoNumero(1000); // Comienza desde cero o el número que prefieras
+            secuencia.setUltimoNumero(1000); // Comienza desde 1000
             secuenciaPedidoRepository.save(secuencia);
         }
     }
