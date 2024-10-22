@@ -8,6 +8,8 @@ import com.example.E_Commerce.domain.repositories.ProductoRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ProductoNoEncontradoException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductoService {
 
@@ -41,6 +43,41 @@ public class ProductoService {
         return productoRepository.findById(id)
                 .filter(ProductoEntity::getDisponible)
                 .orElseThrow(() -> new ProductoNoEncontradoException("El producto seleccionado no se encuentra disponible"));
+    }
+
+    public ProductoRespuestaDTO obtenerProductoDto(Long id){
+        return productoRepository.findById(id)
+                .filter(ProductoEntity::getDisponible)
+                .map(producto -> new ProductoRespuestaDTO(
+                        producto.getNombre(),
+                        producto.getDescripcion(),
+                        producto.getPrecio(),
+                        producto.getStock(),
+                        producto.getCategoria()
+                ))
+                .orElseThrow(() -> new ProductoNoEncontradoException("El producto seleccionado no se encuentra disponible"));
+    }
+
+
+    public List<ProductoRespuestaDTO> obtenerProductos(){
+        return productoRepository.findAll()
+                .stream()
+                .filter(ProductoEntity::getDisponible)
+                .map(producto -> new ProductoRespuestaDTO(
+                        producto.getNombre(),
+                        producto.getDescripcion(),
+                        producto.getPrecio(),
+                        producto.getStock(),
+                        producto.getCategoria()
+                )).toList();
+    }
+
+    public void eliminarProducto(Long id){
+
+        if(!productoRepository.existsById(id))
+            throw new ProductoNoEncontradoException("el producto seleccionado no se encuentra disponible");
+
+        productoRepository.deleteById(id);
     }
 
     public boolean estaDisponible(ProductoEntity producto, int cantidad) {

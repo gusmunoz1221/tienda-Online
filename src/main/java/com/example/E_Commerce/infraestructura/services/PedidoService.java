@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -143,26 +144,21 @@ public class PedidoService {
 
         if (!productosNoDisponibles.isEmpty()) {
 
-            StringBuilder mensajeError = new StringBuilder("Pedido fallido Problemas con algunos productos:");
-
-            // Concatenar cada mensaje de productos no disponibles
-            for (String mensaje : productosNoDisponibles) {
-                mensajeError.append(mensaje);
-            }
-
-            // Lanzo la excepción con el mensaje concatenado
-            throw new ProductoNoEncontradoException(mensajeError.toString());
+            String mensajeError = productosNoDisponibles.stream()
+                    .collect(Collectors.joining(", ", "Pedido fallido: Problemas con algunos productos: ", ""));
+            throw new ProductoNoEncontradoException(mensajeError);
         }
+
         pedido.setProductos(productosPedido);
 
+        //llamamos a procesar pedido
+        prosesarPedido(pedido);
 
         //elimino los productos del carrito
         carritoService.eliminarCarritoPorPedido(productosParaEliminar, cliente);
+
         pedidoRepository.save(pedido);
 
-        //llamamos a procesar pedido
-
-        prosesarPedido(pedido);
 
         // creamos un nuevo dto que contiene una lista de PedidoCarritoRespuestaDTO
         // mapeamos una lista de productos entities a una lista PedidoCarritoRespuestaDTO;
@@ -176,6 +172,7 @@ public class PedidoService {
         );
     }
 
+    @Transactional
     public void prosesarPedido(PedidoEntity pedido){
         pedido.setEstado(EstadoPedido.EN_PROCESO);
 
