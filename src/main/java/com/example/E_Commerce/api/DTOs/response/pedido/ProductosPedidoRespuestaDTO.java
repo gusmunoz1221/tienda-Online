@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 public class ProductosPedidoRespuestaDTO {
     private String numeroDePedido;
-    private Date fecha;
+    private String fecha;
     private int cantidad;
     private BigDecimal percioTotal;
     private List<PedidoCarritoRespuestaDTO> productos;

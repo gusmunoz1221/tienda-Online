@@ -6,6 +6,7 @@ import com.example.E_Commerce.api.DTOs.response.pedido.PedidoCarritoRespuestaDTO
 import com.example.E_Commerce.api.DTOs.response.pedido.ProductosPedidoRespuestaDTO;
 import com.example.E_Commerce.domain.EstadoPedido;
 import com.example.E_Commerce.domain.entities.*;
+import com.example.E_Commerce.domain.helpers.CorreoElectronicoHelper;
 import com.example.E_Commerce.domain.repositories.PedidoRepository;
 import com.example.E_Commerce.domain.repositories.SecuenciaPedidoRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ProductoNoEncontradoException;
@@ -15,6 +16,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,13 +34,16 @@ public class PedidoService {
     private final ClienteService clienteService;
     private final SecuenciaPedidoRepository secuenciaPedidoRepository;
 
+    private final CorreoElectronicoHelper correoElectronicoHelper;
 
-    public PedidoService(PedidoRepository pedidoRepository, CarritoService carritoService, ProductoService productoService, ClienteService clienteService, SecuenciaPedidoRepository secuenciaPedidoRepository) {
+
+    public PedidoService(PedidoRepository pedidoRepository, CarritoService carritoService, ProductoService productoService, ClienteService clienteService, SecuenciaPedidoRepository secuenciaPedidoRepository, CorreoElectronicoHelper correoElectronicoHelper) {
         this.pedidoRepository = pedidoRepository;
         this.carritoService = carritoService;
         this.productoService = productoService;
         this.clienteService = clienteService;
         this.secuenciaPedidoRepository = secuenciaPedidoRepository;
+        this.correoElectronicoHelper = correoElectronicoHelper;
     }
 
 
@@ -49,11 +56,10 @@ public class PedidoService {
        if(!productoService.estaDisponible(producto,pedidoProductoSolicitud.getCantidad()))
            throw new IllegalArgumentException("el producto no tiene stock suficiente, stock dispinible: "+producto.getStock());
 
-
         //seteo el cliente al pedido junto con la fecha que lo realizo
        PedidoEntity pedido = PedidoEntity.builder()
                .cliente(cliente)
-               .fecha(new Date())
+               .fecha(LocalDateTime.now())
                .numeroDePedido(generarNumeroPedido())
                .build();
 
@@ -72,7 +78,7 @@ public class PedidoService {
 
         pedidoRepository.save(pedido);
 
-        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(),pedido.getFecha(), pedidoProductoSolicitud.getCantidad(), producto.getPrecio(),pedido.getProductos()
+        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(),pedido.obtenerFechaFormateada(), pedidoProductoSolicitud.getCantidad(), producto.getPrecio(),pedido.getProductos()
                 .stream()
                 .map(productoPedidoEntity -> new PedidoCarritoRespuestaDTO(
                         productoPedidoEntity.getProducto().getNombre(),
@@ -96,7 +102,7 @@ public class PedidoService {
         //seteo el cliente al pedido junto con la fecha que lo realizo
         PedidoEntity pedido = PedidoEntity.builder()
                 .cliente(cliente)
-                .fecha(new Date())
+                .fecha(LocalDateTime.now())
                 .numeroDePedido(generarNumeroPedido())
                 .estado(EstadoPedido.PENDIENTE)
                 .build();
@@ -152,17 +158,25 @@ public class PedidoService {
         pedido.setProductos(productosPedido);
 
         //llamamos a procesar pedido
-    //    prosesarPedido(pedido);
+        //prosesarPedido(pedido);
+
+        //hasta implementar la pasarela de pago
+        pedido.setEstado(EstadoPedido.EN_PROCESO);
+
+      // if (!pedido.getEstado().equals(EstadoPedido.EN_PROCESO))
+     //       throw new ConflictoDePagoException("no se pudo procesar el pedido");
+
+       pedidoRepository.save(pedido);
+
+       correoElectronicoHelper.enviarCorreoCompraDeProducto(cliente.getCorreo(),cliente.getNombre(),productosParaEliminar,pedido,pedido.getNumeroDePedido());
 
         //elimino los productos del carrito
         carritoService.eliminarCarritoPorPedido(productosParaEliminar, cliente);
 
-        pedidoRepository.save(pedido);
-
 
         // creamos un nuevo dto que contiene una lista de PedidoCarritoRespuestaDTO
         // mapeamos una lista de productos entities a una lista PedidoCarritoRespuestaDTO;
-        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(), pedido.getFecha(), cantidadDeProductosEnPedido, precioTotal,
+        return new ProductosPedidoRespuestaDTO(pedido.getNumeroDePedido(), pedido.obtenerFechaFormateada(), cantidadDeProductosEnPedido, precioTotal,
                 pedido.getProductos()
                         .stream()
                         .map(producto -> new PedidoCarritoRespuestaDTO(
@@ -191,4 +205,5 @@ public class PedidoService {
         // Formato alfanumérico, 6 dígitos
         return "PED-" + String.format("%06d", secuencia.getUltimoNumero());
     }
+
 }

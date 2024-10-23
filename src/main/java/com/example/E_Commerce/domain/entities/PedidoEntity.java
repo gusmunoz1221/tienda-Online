@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.Date;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -21,7 +23,7 @@ public class PedidoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Date fecha;
+    private LocalDateTime fecha;
     private String numeroDePedido;
 
     @Enumerated(EnumType.STRING)
@@ -39,4 +41,9 @@ public class PedidoEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     private EnvioEntity envio;
+
+    public String obtenerFechaFormateada() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy H:mm");
+        return fecha.format(formato);
+    }
 }

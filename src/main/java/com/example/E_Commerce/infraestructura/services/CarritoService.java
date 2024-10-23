@@ -2,23 +2,23 @@ package com.example.E_Commerce.infraestructura.services;
 
 import com.example.E_Commerce.api.DTOs.request.carrito.ModificarProductoCarritoDTO;
 import com.example.E_Commerce.api.DTOs.request.carrito.ProductoCarritoSolicitudDTO;
+import com.example.E_Commerce.api.DTOs.response.carrito.CarritoVacioRespuestaDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoCarritoRespuestaDTO;
 import com.example.E_Commerce.api.DTOs.response.carrito.ProductoPedidoCarrito;
 import com.example.E_Commerce.domain.entities.CarritoEntity;
 import com.example.E_Commerce.domain.entities.ProductoEntity;
-import com.example.E_Commerce.domain.entities.ProductoPedidoEntity;
 import com.example.E_Commerce.domain.entities.UsuarioEntity;
 import com.example.E_Commerce.domain.repositories.CarritoRepository;
 import com.example.E_Commerce.domain.repositories.UsuarioRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ArgumentoIlegalException;
-import jakarta.transaction.Transactional;
+import com.example.E_Commerce.infraestructura.exceptions.CarritoVacioException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -90,9 +90,13 @@ public class CarritoService {
 
     }
 
-    public ProductoCarritoRespuestaDTO obtenerCarritoPorId(UUID id){
+    public ResponseEntity<?> obtenerCarritoPorId(UUID id){
 
         UsuarioEntity cliente = clienteService.obtenerClientePorId(id);
+
+        //si el carrito esta vacio devuelve un mensajeDTO
+        if(cliente.getCarrito().getProductos().isEmpty())
+            return ResponseEntity.ok(new CarritoVacioRespuestaDTO("El carrito está vacío"));
 
         List<ProductoCarritoDTO> productosCarritoDto = cliente.getCarrito().getProductos()
                 .entrySet()
@@ -112,13 +116,16 @@ public class CarritoService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
 
-        return new ProductoCarritoRespuestaDTO(productosCarritoDto, precioTotal);
+        return  ResponseEntity.ok(new ProductoCarritoRespuestaDTO(productosCarritoDto, precioTotal));
     }
 
     //utilizado desde el pedidoService
     public Pair<List<ProductoPedidoCarrito>,BigDecimal> obtenerProductosCarrito(UsuarioEntity cliente){
 
         CarritoEntity carrito = cliente.getCarrito();
+
+        if(carrito.getProductos().isEmpty())
+            throw new CarritoVacioException("carrito vacio");
 
         List<ProductoPedidoCarrito> productosCarritoDto = carrito.getProductos()
                 .entrySet()

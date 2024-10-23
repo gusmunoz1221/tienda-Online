@@ -46,7 +46,7 @@ public class CarritoController {
 
 
     @GetMapping("{id}")
-    public ResponseEntity<ProductoCarritoRespuestaDTO> obtenerCarritoPorId(@Validated @PathVariable UUID id){
+    public ResponseEntity<?> obtenerCarritoPorId(@Validated @PathVariable UUID id){
         return ResponseEntity.ok(carritoService.obtenerCarritoPorId(id));
     }
 
