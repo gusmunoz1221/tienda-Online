@@ -152,7 +152,7 @@ public class PedidoService {
         pedido.setProductos(productosPedido);
 
         //llamamos a procesar pedido
-        prosesarPedido(pedido);
+    //    prosesarPedido(pedido);
 
         //elimino los productos del carrito
         carritoService.eliminarCarritoPorPedido(productosParaEliminar, cliente);
@@ -172,7 +172,7 @@ public class PedidoService {
         );
     }
 
-    @Transactional
+  /*  @Transactional
     public void prosesarPedido(PedidoEntity pedido){
         pedido.setEstado(EstadoPedido.EN_PROCESO);
 
@@ -181,7 +181,7 @@ public class PedidoService {
             throw new ConflictoDePagoException("hubo un inconveniente con el pago y no pudo ser procesado");
         }
         
-    }
+    }*/
 
     public String generarNumeroPedido() {
         SecuenciaPedidoEntity secuencia = secuenciaPedidoRepository.findById(1L).orElseThrow();
