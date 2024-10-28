@@ -10,9 +10,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/producto")
@@ -72,4 +75,21 @@ public class ProductoController {
 
         return ResponseEntity.ok(productoService.modificarProducto(id,productoDto));
     }
+
+    @GetMapping("/filtro")
+    public ResponseEntity<List<ProductoRespuestaDTO>> obtenerProductosPorPaginacion(@RequestParam(name = "NumeroDePagina",defaultValue = "0") Integer numeroDePagina,
+                                                                                    @RequestParam(name = "TamanoDePagina",defaultValue = "1") Integer tamanoDePagina,
+                                                                                    @RequestParam(required = false) String nombre,
+                                                                                    @RequestParam(required = false) Long categoriaId,
+                                                                                    @RequestParam(required = false) BigDecimal minimo,
+                                                                                    @RequestParam(required = false)BigDecimal maximo){
+
+        if(categoriaId==null && minimo==null && maximo==null)
+            return ResponseEntity.ok(productoService.buscarProductoPorNombre(numeroDePagina,tamanoDePagina,nombre));
+
+        if(categoriaId!=null && minimo==null && maximo==null)
+            return ResponseEntity.ok(productoService.buscarProductoPorCategoria(numeroDePagina,tamanoDePagina,categoriaId));
+        else return ResponseEntity.ok(productoService.buscarProductoPorNombreYPrecio(numeroDePagina,tamanoDePagina,minimo,maximo,nombre,categoriaId));
+    }
+
 }

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -139,8 +140,10 @@ public class ProductoService {
     /*------------------------paginas--------------------------*/
 
     public List<ProductoRespuestaDTO> buscarProductoPorNombre(Integer numeroDePagina, Integer tamanoDePagina, String nombre){
-    Pageable pageable = PageRequest.of(numeroDePagina,tamanoDePagina, Sort.by("nombre").ascending());
-    return productoRepository.findByNombreContains(nombre,pageable)
+
+        Pageable pageable = PageRequest.of(numeroDePagina,tamanoDePagina, Sort.by("nombre").ascending());
+
+        return productoRepository.findByNombreContains(nombre,pageable)
             .stream()
             .map(producto -> new ProductoRespuestaDTO(
                     producto.getNombre(),
@@ -151,9 +154,16 @@ public class ProductoService {
     )).toList();
     }
 
-    public List<ProductoRespuestaDTO> buscarProductoPorPrecio(Integer numeroDePagina, Integer tamanoDePagina, Double minimo, Double maximo,Long categoriaId){
+    public List<ProductoRespuestaDTO> buscarProductoPorNombreYPrecio(Integer numeroDePagina,
+                                                              Integer tamanoDePagina,
+                                                              BigDecimal minimo,
+                                                              BigDecimal maximo,
+                                                              String nombre,
+                                                              Long categoriaId){
+
         Pageable pageable = PageRequest.of(numeroDePagina,tamanoDePagina);
-        return productoRepository.findByPrecioBetweenAndCategoriaId(minimo,maximo,categoriaId,pageable)
+
+        return productoRepository.findByNombreContainsAndCategoriaIdAndPrecioBetween(nombre,categoriaId,minimo,maximo,pageable)
                 .stream()
                 .map(producto -> new ProductoRespuestaDTO(
                         producto.getNombre(),
@@ -164,8 +174,12 @@ public class ProductoService {
                 )).toList();
     }
 
-    public List<ProductoRespuestaDTO> buscarProductoPorCategoria(Integer numeroDePagina, Integer tamanoDePagina,Long categoriaId){
+    public List<ProductoRespuestaDTO> buscarProductoPorCategoria(Integer numeroDePagina,
+                                                                 Integer tamanoDePagina,
+                                                                 Long categoriaId){
+
         Pageable pageable = PageRequest.of(numeroDePagina,tamanoDePagina);
+
         return productoRepository.findByCategoriaId(categoriaId,pageable)
                 .stream()
                 .map(producto -> new ProductoRespuestaDTO(
@@ -176,5 +190,6 @@ public class ProductoService {
                         producto.getCategoria()
                 )).toList();
     }
+
 
 }
