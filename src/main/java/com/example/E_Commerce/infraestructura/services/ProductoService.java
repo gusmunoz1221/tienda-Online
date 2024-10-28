@@ -7,6 +7,9 @@ import com.example.E_Commerce.domain.entities.ProductoEntity;
 import com.example.E_Commerce.domain.repositories.ProductoRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ArgumentoIlegalException;
 import com.example.E_Commerce.infraestructura.exceptions.ProductoNoEncontradoException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +41,6 @@ public class ProductoService {
              .stock(productoSolicitud.getStock())
              .disponible(true)
              .categoria(categoria).build();
-
      productoRepository.save(producto);
 
     return ProductoRespuestaDTO.builder().nombre(producto.getNombre())
@@ -132,6 +134,47 @@ public class ProductoService {
 
         // Si no hay stock suficiente, retornamos false
         return false;
+    }
+
+    /*------------------------paginas--------------------------*/
+
+    public List<ProductoRespuestaDTO> buscarProductoPorNombre(Integer numeroDePagina, Integer tamanoDePagina, String nombre){
+    Pageable pageable = PageRequest.of(numeroDePagina,tamanoDePagina, Sort.by("nombre").ascending());
+    return productoRepository.findByNombreContains(nombre,pageable)
+            .stream()
+            .map(producto -> new ProductoRespuestaDTO(
+                    producto.getNombre(),
+                    producto.getDescripcion(),
+                    producto.getPrecio(),
+                    producto.getStock(),
+                    producto.getCategoria()
+    )).toList();
+    }
+
+    public List<ProductoRespuestaDTO> buscarProductoPorPrecio(Integer numeroDePagina, Integer tamanoDePagina, Double minimo, Double maximo,Long categoriaId){
+        Pageable pageable = PageRequest.of(numeroDePagina,tamanoDePagina);
+        return productoRepository.findByPrecioBetweenAndCategoriaId(minimo,maximo,categoriaId,pageable)
+                .stream()
+                .map(producto -> new ProductoRespuestaDTO(
+                        producto.getNombre(),
+                        producto.getDescripcion(),
+                        producto.getPrecio(),
+                        producto.getStock(),
+                        producto.getCategoria()
+                )).toList();
+    }
+
+    public List<ProductoRespuestaDTO> buscarProductoPorCategoria(Integer numeroDePagina, Integer tamanoDePagina,Long categoriaId){
+        Pageable pageable = PageRequest.of(numeroDePagina,tamanoDePagina);
+        return productoRepository.findByCategoriaId(categoriaId,pageable)
+                .stream()
+                .map(producto -> new ProductoRespuestaDTO(
+                        producto.getNombre(),
+                        producto.getDescripcion(),
+                        producto.getPrecio(),
+                        producto.getStock(),
+                        producto.getCategoria()
+                )).toList();
     }
 
 }
