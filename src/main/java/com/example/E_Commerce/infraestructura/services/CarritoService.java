@@ -18,7 +18,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,16 +30,13 @@ import java.util.UUID;
 public class CarritoService {
 
     private final CarritoRepository carritoRepository;
-
     private final ProductoService productoService;
     private final ClienteService clienteService;
-    private final UsuarioRepository clienteRepository;
 
     public CarritoService(CarritoRepository carritoRepository, ProductoService productoService, ClienteService clienteService, UsuarioRepository clienteRepository) {
         this.carritoRepository = carritoRepository;
         this.productoService = productoService;
         this.clienteService = clienteService;
-        this.clienteRepository = clienteRepository;
     }
 
     @Value("${carrito.max_productos}")

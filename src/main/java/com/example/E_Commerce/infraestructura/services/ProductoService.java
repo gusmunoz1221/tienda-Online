@@ -137,6 +137,10 @@ public class ProductoService {
         return false;
     }
 
+    public Integer obtenerStock(Long idProducto){
+        return productoRepository.findById(idProducto).get().getStock();
+    }
+
     /*------------------------paginas--------------------------*/
 
     public List<ProductoRespuestaDTO> buscarProductoPorNombre(Integer numeroDePagina, Integer tamanoDePagina, String nombre){
