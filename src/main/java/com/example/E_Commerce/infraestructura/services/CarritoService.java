@@ -13,20 +13,19 @@ import com.example.E_Commerce.domain.repositories.CarritoRepository;
 import com.example.E_Commerce.domain.repositories.UsuarioRepository;
 import com.example.E_Commerce.infraestructura.exceptions.ArgumentoIlegalException;
 import com.example.E_Commerce.infraestructura.exceptions.CarritoVacioException;
-import lombok.extern.slf4j.Slf4j;
+import com.example.E_Commerce.infraestructura.exceptions.ProductoSinStockException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @Service
-@Slf4j
 public class CarritoService {
 
     private final CarritoRepository carritoRepository;
@@ -46,6 +45,7 @@ public class CarritoService {
     @Value("${carrito.porcentaje_descuento}")
     private double porcentajeDescuento;
 
+    @Transactional
     public ProductoCarritoRespuestaDTO agregarProductoCarrito(ProductoCarritoSolicitudDTO productoCarritoSolicitud) {
         //valido si es de origen argetino
         if (!(productoCarritoSolicitud.getPais().contains("AR")))
@@ -59,6 +59,10 @@ public class CarritoService {
 
         //valido si el producto existe y esta disponible
         ProductoEntity producto = productoService.obtenerProductoPorId(productoCarritoSolicitud.getProductoId());
+
+        // valido si la cantidad es menor a la del carrito
+        if(producto.getStock()<productoCarritoSolicitud.getCantidad())
+            throw new ProductoSinStockException("producto sin stock");
 
         //seteo producto y la cantidad, utilizo la metodo sum (PF) incrementando la cantidad
        carrito.getProductos().merge(producto,productoCarritoSolicitud.getCantidad(), Integer::sum);

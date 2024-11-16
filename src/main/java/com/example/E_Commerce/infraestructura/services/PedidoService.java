@@ -51,7 +51,8 @@ public class PedidoService {
 
         UsuarioEntity cliente = clienteService.obtenerClientePorId(pedidoProductoSolicitud.getId());
 
-        ProductoEntity producto = productoService.obtenerProductoPorId(pedidoProductoSolicitud.getIdProducto());
+        //obtengo el producto con bloqueo para evitar las condiciones de carrera y que un cliente modifique el stock a la vez
+        ProductoEntity producto = productoService.obtenerProductoConBloqueo(pedidoProductoSolicitud.getIdProducto());
 
        if(!productoService.estaDisponible(producto,pedidoProductoSolicitud.getCantidad()))
            throw new IllegalArgumentException("el producto no tiene stock suficiente, stock dispinible: "+producto.getStock());

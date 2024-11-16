@@ -56,6 +56,13 @@ public class ProductoService {
                 .orElseThrow(() -> new ProductoNoEncontradoException("El producto seleccionado no se encuentra disponible"));
     }
 
+    public ProductoEntity obtenerProductoConBloqueo(Long id){
+        if(!productoRepository.existsById(id))
+            throw new ProductoNoEncontradoException("no se encontro el producto");
+
+        return productoRepository.obtenerProductoConBloqueo(id);
+    }
+
     public ProductoRespuestaDTO obtenerProductoDto(Long id){
         return productoRepository.findById(id)
                 .filter(ProductoEntity::getDisponible)
@@ -135,10 +142,6 @@ public class ProductoService {
 
         // Si no hay stock suficiente, retornamos false
         return false;
-    }
-
-    public Integer obtenerStock(Long idProducto){
-        return productoRepository.findById(idProducto).get().getStock();
     }
 
     /*------------------------paginas--------------------------*/
